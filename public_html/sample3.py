@@ -2,24 +2,22 @@
 import os
 import time
 import Cookie
-import libsess
+import libGAEsession
 
 def main():
-	cookie = Cookie.SimpleCookie()
-	session = libsess.sei()
+	cookie = Cookie.SimpleCookie(os.environ.get("HTTP_COOKIE",""))
+	session = libGAEsession.session()
 
-	if os.environ.has_key("HTTP_COOKIE"):
-		cookie.load(os.environ["HTTP_COOKIE"])
-		if cookie.has_key("sessionid"):
-			if session.load(cookie["sessionid"].value) == None:
-				session.new()
+	if cookie.has_key("sessionid"):
+		if session.load(cookie["sessionid"].value) == None:
+			session.new()
 
 	session.set("i",session.get("i",0) + 1)
 
-	print "Set-Cookie: sessionid=%s; expires=%s; path=/" % (session.id_(),time.strftime("%a, %d-%b-%Y %H:%M:%S GMT",time.gmtime(time.time() + 86400)))
+	print "Set-Cookie: sessionid=%s; expires=%s; path=/" % (session.getid(),time.strftime("%a, %d-%b-%Y %H:%M:%S GMT",time.gmtime(time.time() + 86400)))
 	print "Content-Type: text/html"
 	print ""
-	print "id = %s" % (session.id_())
+	print "id = %s" % (session.getid())
 	print session.get("i")
 
 	session.save()
