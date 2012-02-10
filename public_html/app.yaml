@@ -10,3 +10,6 @@ handlers:
 
 - url: /sample1\.py
   script: sample1.py
+
+- url: /sample2\.py
+  script: sample2.py
