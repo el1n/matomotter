@@ -13,3 +13,6 @@ handlers:
 
 - url: /sample2\.py
   script: sample2.py
+
+- url: /sample3\.py
+  script: sample3.py
