@@ -1,15 +1,15 @@
 import uuid
 import cPickle
 import google.appengine.ext.db
+import google.appengine.api.memcache
 
-class session:
-	class db(google.appengine.ext.db.Model):
-		id = google.appengine.ext.db.StringProperty()
-		d = google.appengine.ext.db.BlobProperty()
-
-	dbi = db()
-	id = None
-	d = {}
+class _:
+	def __init__(s,namespace = u"libGAEsession",expire = 604800):
+		s.dbh = s.dbi()
+		s.namespace = namespace
+		s.expire = expire
+		s.id = None
+		s.d = {}
 
 	def new(s):
 		s.id = unicode(uuid.uuid4())
@@ -33,8 +33,14 @@ class session:
 			else:
 				return(None)
 
+class session(_):
+	class db(google.appengine.ext.db.Model):
+		namespace = google.appengine.ext.db.StringProperty()
+		id = google.appengine.ext.db.StringProperty()
+		d = google.appengine.ext.db.BlobProperty()
+
 	def load(s,id):
-		r = s.dbi.gql("WHERE id = :1 LIMIT 0,1",id).get()
+		r = s.dbi.gql("WHERE namespace = :1 AND id = :2 LIMIT 0,1",s.namespace,id).get()
 		if r != None:
 			s.id = r.id
 			s.d = cPickle.loads(r.d)
@@ -44,8 +50,28 @@ class session:
 			return(None)
 
 	def save(s):
+		s.dbi.namespace = s.namespace
 		s.dbi.id = s.id
 		s.dbi.d = cPickle.dumps(s.d)
 		s.dbi.put()
+
+		return(1)
+
+class session_memcache(_):
+	class dbi():
+		1
+
+	def load(s,id):
+		r = google.appengine.api.memcache.get(s.namespace + u"." + id)
+		if r != None:
+			s.id = id
+			s.d = cPickle.loads(r)
+
+			return(s.id)
+		else:
+			return(None)
+
+	def save(s):
+		google.appengine.api.memcache.set(s.namespace + u"." + s.id,cPickle.dumps(s.d),s.expire)
 
 		return(1)
