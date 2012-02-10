@@ -6,10 +6,11 @@ import libGAEsession
 
 def main():
 	cookie = Cookie.SimpleCookie(os.environ.get("HTTP_COOKIE",""))
-	session = libGAEsession.session()
+	#session = libGAEsession.session()
+	session = libGAEsession.session_memcache()
 
 	if cookie.has_key("sessionid"):
-		if session.load(cookie["sessionid"].value) == None:
+		if session.load(cookie["sessionid"].value.decode("ascii")) == None:
 			session.new()
 
 	session.set("i",session.get("i",0) + 1)
