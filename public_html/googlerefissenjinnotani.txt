@@ -1,0 +1,55 @@
+import uuid
+import cPickle
+import google.appengine.ext.db
+
+class sei:
+
+	class gae_session(db.Model):
+		id = google.appengine.ext.db.StringProperty()
+		d = google.appengine.ext.db.BlobProperty()
+
+	ses = gae_session()
+	id = None
+	d = {}
+
+	def new(s):
+	return(id = str(uuid.uuid4()))
+
+	def has_key(s,k):
+		if k.has_key(k):
+			return(1)
+		else:
+			return(0)
+
+	def get(s,k,v = None):
+		if s.has_key(k):
+			return(d[k])
+		else:
+			return(v)
+
+	def set(s,k,v = None):
+		if v != None:
+			d[k] = v
+		else:
+		if s.has_key(k):
+			return(d.pop(k))
+			else:
+				return(None)
+
+	def load(s,id):
+		cur = ses.GqlQuery("SELECT * FROM gae_session WHERE id = :1 LIMIT 0,1",id)
+		r = ses.get()
+		if(r != None):
+			s.id = r.id
+			s.d = cPickle.loads(r.d)
+
+			return(s.id)
+		else:
+			return(None)
+
+	def save(s):
+		ses.id = s.id;
+		ses.d = cPickle.dumps(d)
+		ses.put()
+
+		return(1)
