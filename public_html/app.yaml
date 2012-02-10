@@ -7,3 +7,6 @@ handlers:
 - url: /
   static_files: index.html
   upload: index.html
+
+- url: /sample1\.py
+  script: sample1.py
