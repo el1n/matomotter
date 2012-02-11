@@ -10,6 +10,8 @@ class _:
 		s.id = None
 		s.d = {}
 
+		s.new()
+
 	def new(s):
 		s.id = unicode(uuid.uuid4())
 		return(s.id)
