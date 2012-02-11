@@ -13,9 +13,9 @@ import libGAEsession
 import conf
 
 CALLBACK_URI = "http://localhost:8080/sample8.py"
-sys.stdout = codecs.getwriter("utf-8")(sys.stdout)
 
 def main():
+	sys.stdout = codecs.getwriter("utf-8")(sys.stdout)
 	cookie = Cookie.SimpleCookie(os.environ.get("HTTP_COOKIE",""))
 	session = libGAEsession.session_memcache()
 	param = cgi.FieldStorage()
@@ -60,13 +60,12 @@ def main():
 		auth.set_access_token(session.get("access_key"),session.get("access_secret"))
 
 		if param.has_key("post_value"):
-#			try:
-#				api.update_status(post_value)
+			try:
+				api.update_status(post_value)
 				print u"Tweeted: "+ post_value
-#				print "Tweeted: "+ post_value
 				
-#			except:
-#				print u"Post Error"
+			except:
+				print u"Post Error"
 
 	session.save()
 
