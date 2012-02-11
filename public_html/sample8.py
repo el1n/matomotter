@@ -60,11 +60,13 @@ def main():
 		auth.set_access_token(session.get("access_key"),session.get("access_secret"))
 
 		if param.has_key("post_value"):
-			try:
+#			try:
 #				api.update_status(post_value)
-				print u"Tweeted: "+post_value.encode("utf-8")
-			except:
-				print u"Post Error"
+				print u"Tweeted: "+ post_value
+#				print "Tweeted: "+ post_value
+				
+#			except:
+#				print u"Post Error"
 
 	session.save()
 
