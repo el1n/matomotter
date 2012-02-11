@@ -5,7 +5,6 @@ import google.appengine.api.memcache
 
 class _:
 	def __init__(s,namespace = u"libGAEsession",expire = 604800):
-		s.dbh = s.dbi()
 		s.namespace = namespace
 		s.expire = expire
 		s.id = None
@@ -57,9 +56,6 @@ class session(_):
 		return(1)
 
 class session_memcache(_):
-	class dbi():
-		1
-
 	def load(s,id):
 		r = google.appengine.api.memcache.get(s.namespace + u"." + id)
 		if r != None:
