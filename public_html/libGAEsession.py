@@ -34,26 +34,25 @@ class _:
 				return(None)
 
 class session(_):
-	class db(google.appengine.ext.db.Model):
-		namespace = google.appengine.ext.db.StringProperty()
-		id = google.appengine.ext.db.StringProperty()
+	class dbi(google.appengine.ext.db.Model):
 		d = google.appengine.ext.db.BlobProperty()
 
 	def load(s,id):
-		r = s.dbi.gql("WHERE namespace = :1 AND id = :2 LIMIT 0,1",s.namespace,id).get()
-		if r != None:
-			s.id = r.id
-			s.d = cPickle.loads(r.d)
+		cur = s.dbi.get_by_key_name(s.namespace + "." + id)
+		if cur != None:
+			s.id = id
+			s.d = cPickle.loads(cur.d)
 
 			return(s.id)
 		else:
 			return(None)
 
 	def save(s):
-		s.dbi.namespace = s.namespace
-		s.dbi.id = s.id
-		s.dbi.d = cPickle.dumps(s.d)
-		s.dbi.put()
+		cur = s.dbi.get_by_key_name(s.namespace + "." + s.id)
+		if cur == None:
+			cur = s.dbi(key_name = s.namespace + "." + s.id)
+		cur.d = cPickle.dumps(s.d)
+		cur.put()
 
 		return(1)
 
