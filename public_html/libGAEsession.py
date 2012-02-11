@@ -38,7 +38,7 @@ class session(_):
 		d = google.appengine.ext.db.BlobProperty()
 
 	def load(s,id):
-		cur = s.dbi.get_by_key_name(s.namespace + "." + id)
+		cur = s.dbi.get_by_key_name(s.namespace + u"." + id)
 		if cur != None:
 			s.id = id
 			s.d = cPickle.loads(cur.d)
@@ -48,9 +48,9 @@ class session(_):
 			return(None)
 
 	def save(s):
-		cur = s.dbi.get_by_key_name(s.namespace + "." + s.id)
+		cur = s.dbi.get_by_key_name(s.namespace + u"." + s.id)
 		if cur == None:
-			cur = s.dbi(key_name = s.namespace + "." + s.id)
+			cur = s.dbi(key_name = s.namespace + u"." + s.id)
 		cur.d = cPickle.dumps(s.d)
 		cur.put()
 
