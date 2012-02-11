@@ -3,6 +3,8 @@
 # coding: UTF-8
 
 import os
+import sys
+import codecs
 import cgi
 import time
 import Cookie
@@ -11,6 +13,7 @@ import libGAEsession
 import conf
 
 CALLBACK_URI = "http://localhost:8080/sample8.py"
+sys.stdout = codecs.getwriter("utf-8")(sys.stdout)
 
 def main():
 	cookie = Cookie.SimpleCookie(os.environ.get("HTTP_COOKIE",""))
@@ -59,7 +62,7 @@ def main():
 		if param.has_key("post_value"):
 			try:
 #				api.update_status(post_value)
-				print u"Tweeted: "+(post_value).encode("utf-8")
+				print u"Tweeted: "+post_value.encode("utf-8")
 			except:
 				print u"Post Error"
 
