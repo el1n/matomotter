@@ -29,5 +29,8 @@ handlers:
 - url: /sample7\.py
   script: sample7.py
 
+- url: /sample8\.py
+  script: sample8.py
+
 - url: /sample9\.py
   script: sample9.py
