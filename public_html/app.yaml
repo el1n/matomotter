@@ -25,3 +25,6 @@ handlers:
 
 - url: /sample6\.py
   script: sample6.py
+
+- url: /p_sample6\.py
+  script: p_sample6.py
