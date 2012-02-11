@@ -1,2 +1,4 @@
 /public_html/*.pyc
+/public_html/tweepy/*
+/public_html/conf.*
 /var/*

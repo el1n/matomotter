@@ -1,10 +1,13 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+# coding: UTF-8
+
 import os
 import cgi
 import time
 import Cookie
 import twiauth
+import tweepy
 import libGAEsession
 
 CALLBACK_URI = "http://localhost:8080/sample5.py"
@@ -24,12 +27,15 @@ def main():
 
 	if param.has_key("oauth_token") and param.has_key("oauth_verifier") and not session.get("token_secret",None) == None:
             ak = twiauth.getatoken(oauth_token, oauth_verifier, session.get("token_secret"))
-            session.set("username", ak[0])
-            session.set("access_key", ak[1])
+            session.set("userid",ak[0])
+            session.set("username",ak[1])
+            session.set("access_key",ak[2])
+            session.set("access_key_secret",ak[3])
             logon = True
 
         print "Set-Cookie: sessionid=%s; expires=%s; path=/" % (session.getid(),time.strftime("%a, %d-%b-%Y %H:%M:%S GMT",time.gmtime(time.time() + 86400)))
 	print "Content-Type: text/html"
+	
 	print ""
             
         if logon == False and session.get("username",None) == None:
@@ -39,6 +45,11 @@ def main():
         else:
             logon = True
             print u"logged in as @" + session.get("username") + "<br>"
+            postvalue = u"APIからテスト投稿"
+            try:
+                twiauth.posttweet(session.get("access_key"),session.get("access_key_secret"),postvalue)
+            except:
+                print u"Post Error"
 
 	session.save()
 

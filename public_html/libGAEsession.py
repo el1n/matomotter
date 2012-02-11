@@ -7,9 +7,8 @@ class _:
 	def __init__(s,namespace = u"libGAEsession",expire = 604800):
 		s.namespace = namespace
 		s.expire = expire
-		s.id = None
-		s.d = {}
 
+		s.clear()
 		s.new()
 
 	def new(s):
@@ -33,6 +32,10 @@ class _:
 				return(s.d.pop(k))
 			else:
 				return(None)
+
+	def clear(s):
+		s.d = {}
+		return()
 
 class session(_):
 	class dbi(google.appengine.ext.db.Model):
