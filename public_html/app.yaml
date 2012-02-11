@@ -22,3 +22,6 @@ handlers:
 
 - url: /sample5\.py
   script: sample5.py
+
+- url: /sample6\.py
+  script: sample6.py
