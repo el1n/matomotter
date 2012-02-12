@@ -34,3 +34,6 @@ handlers:
 
 - url: /sample9\.py
   script: sample9.py
+
+- url: /test/
+  script: sample10.py
