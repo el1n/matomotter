@@ -19,9 +19,7 @@ HOME_URI = "http://localhost:8080/test/"
 
 def main():
 
-	sys.stdout = codecs.getwriter("utf-8")(sys.stdout) # クソ文字コード処理対策
 	cookie = Cookie.SimpleCookie(os.environ.get("HTTP_COOKIE","")) # クッキーおいしいです
-
 	session = libGAEsession.session_memcache() # セッションDB
 	db = libmatomotter.q() # 質問DB
 
@@ -81,11 +79,10 @@ def main():
 			auth.set_access_token(session.get("access_key"),session.get("access_secret"))
 			session.set("id",api.me().id)
 			session.set("screen_name",api.me().screen_name)
-			url = HOME_URI+session.get("int_cb","")
+			url = HOME_URI+session.pop("int_cb","")
 		except:
 			url = HOME_URI+"?m=login"
 		finally:
-			
 			print u"Location:"+url
 
 		session.save()
@@ -104,10 +101,24 @@ def main():
 			try: # access_keyとaccess_secretが使えるかどうか確認
 				auth.set_access_token(session.get("access_key"),session.get("access_secret"))
 				username = auth.get_username()
-				
-	
-	
-				url
+				if not session.get("q_temp") == None:
+					q = session.pop("q_temp")
+					q[id] = session.get("id")
+					q[screen_name] = session.get("screen_name")
+				else:
+					q = {
+						"subject":param.getvalue("subject","").decode("utf-8"),
+						"option0":param.getvalue("option0","").decode("utf-8"),
+						"option1":param.getvalue("option1","").decode("utf-8"),
+						"option2":param.getvalue("option2","").decode("utf-8"),
+						"option3":param.getvalue("option3","").decode("utf-8"),
+						"id":session.get("id"),
+						"screen_name":session.get("screen_name")
+					}
+					url = HOME_URI+u"?m=q&id="+db.set(q)
+					print u""
+					print url
+
 			except: # 使えなかった場合
 				q = {
 					"subject":param.getvalue("subject","").decode("utf-8"),
@@ -118,16 +129,17 @@ def main():
 				}
 				session.set("q_temp",q)
 				session.set("int_cb","?m=make&post_flg=True")
-				url = HOME_URI+u""
+				url = HOME_URI+u"?m=login"
+				print url
 			finally:
-				print u"Location:"+url
-	
+#				print u"Location:"+url
+				print u""
+
 			print u""
 			session.save()
-	
-	
+
 		else:
-	
+
 			print u""
 			try: # access_keyとaccess_secretが使えるかどうか確認
 				auth.set_access_token(session.get("access_key"),session.get("access_secret"))
@@ -140,7 +152,7 @@ def main():
 			finally:
 				print user_status
 				print u'<a href="?m=logout">Logout</a><br>'
-	
+
 			print u'<form method="POST" action="'+HOME_URI+u'?m=make">'
 			print u'<input type="hidden" name="post_flg" value="True">'
 			print u'<input type="text" name="subject" value=""><br>'
@@ -150,7 +162,7 @@ def main():
 			print u'<input type="text" name="option3" value=""><br>'
 			print u'<input type="submit" value="Post">'
 			print u'</form>'
-	
+
 	elif m == "q": # 回答ペーーーーーージ
 		print u"質問に答えるのれす^q^"
 
@@ -171,6 +183,8 @@ def main():
 			print u'<a href="?m=logout">Logout</a><br>'
 			print u'<a href="?m=make">Make Question</a><br>'
 
+
+		print session.get("q_temp","Empty")
 #		if login == True: # ログイン状態の時
 #			id_list = api.friends_ids() # フォロー中idを5000件上限で持ってくる
 #			users = [] # 格納用のリスト作成
