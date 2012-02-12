@@ -96,18 +96,18 @@ def main():
 
 
 	elif m == "make": #質問作成ペーーーーージ
-	
 		if param.getvalue("post_flg","False").decode("utf-8") == "True":
 			try: # access_keyとaccess_secretが使えるかどうか確認
 				auth.set_access_token(session.get("access_key"),session.get("access_secret"))
 				username = auth.get_username()
-				if not session.get("q_temp") == None:
-					q = session.pop("q_temp")
-					q[id] = session.get("id")
-					q[screen_name] = session.get("screen_name")
+				if not session.get("q_temp",None) == None:
+					q = session.get("q_temp")
+					session.set("q_temp",None)
+					q["id"] = session.get("id")
+					q["screen_name"] = session.get("screen_name")
 				else:
 					q = {
-						"subject":param.getvalue("subject","").decode("utf-8"),
+						"theme":param.getvalue("theme","").decode("utf-8"),
 						"option0":param.getvalue("option0","").decode("utf-8"),
 						"option1":param.getvalue("option1","").decode("utf-8"),
 						"option2":param.getvalue("option2","").decode("utf-8"),
@@ -115,13 +115,10 @@ def main():
 						"id":session.get("id"),
 						"screen_name":session.get("screen_name")
 					}
-					url = HOME_URI+u"?m=q&id="+db.set(q)
-					print u""
-					print url
-
+				url = HOME_URI+u"?m=q&id="+str(db.set(q))
 			except: # 使えなかった場合
 				q = {
-					"subject":param.getvalue("subject","").decode("utf-8"),
+					"theme":param.getvalue("theme","").decode("utf-8"),
 					"option0":param.getvalue("option0","").decode("utf-8"),
 					"option1":param.getvalue("option1","").decode("utf-8"),
 					"option2":param.getvalue("option2","").decode("utf-8"),
@@ -130,10 +127,8 @@ def main():
 				session.set("q_temp",q)
 				session.set("int_cb","?m=make&post_flg=True")
 				url = HOME_URI+u"?m=login"
-				print url
 			finally:
-#				print u"Location:"+url
-				print u""
+				print u"Location:"+url
 
 			print u""
 			session.save()
@@ -155,7 +150,7 @@ def main():
 
 			print u'<form method="POST" action="'+HOME_URI+u'?m=make">'
 			print u'<input type="hidden" name="post_flg" value="True">'
-			print u'<input type="text" name="subject" value=""><br>'
+			print u'<input type="text" name="theme" value=""><br>'
 			print u'<input type="text" name="option0" value="">'
 			print u'<input type="text" name="option1" value="">'
 			print u'<input type="text" name="option2" value="">'
@@ -164,7 +159,15 @@ def main():
 			print u'</form>'
 
 	elif m == "q": # 回答ペーーーーーージ
-		print u"質問に答えるのれす^q^"
+		print u""
+		print u'質問に答えるのれす^q^<br>'
+		r = db.get(int(param.getvalue("id")))
+		print u"しつもん: "+r.get("theme",None)+u"<br>"
+		print u"こたえ１: "+r.get("option0",None)
+		print u"こたえ２: "+r.get("option1",None)
+		print u"こたえ３: "+r.get("option2",None)
+		print u"こたえ４: "+r.get("option3",None)
+
 
 	else: # トップペーーーージ
 
