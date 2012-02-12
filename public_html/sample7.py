@@ -13,7 +13,7 @@ def main():
 			print
 			print u"id = "+str(r.get("id",None))
 			print u"screen_name = "+r.get("screen_name",None)
-			print u"subject = "+r.get("subject",None)
+			print u"theme = "+r.get("theme",None)
 			print u"option0 = "+r.get("option0",None)
 		else:
 			print u"Content-Type: text/html"
@@ -23,7 +23,7 @@ def main():
 		q = {
 			"id":123,
 			"screen_name":"foo",
-			"subject":"subject",
+			"theme":"theme",
 			"option0":"option0"
 		}
 

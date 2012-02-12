@@ -1,7 +1,7 @@
 import google.appengine.ext.db
 
 class q:
-	class dbi(google.appengine.ext.db.Model):
+	class dbi_q(google.appengine.ext.db.Model):
 		id = google.appengine.ext.db.IntegerProperty()
 		screen_name = google.appengine.ext.db.StringProperty()
 		theme = google.appengine.ext.db.StringProperty()
@@ -16,7 +16,7 @@ class q:
 		return(s.id)
 
 	def get(s,id):
-		cur = s.dbi.get_by_id(id)
+		cur = s.dbi_q.get_by_id(id)
 		if cur != None:
 			r = {
 				u"id":cur.id,
@@ -45,9 +45,9 @@ class q:
 
 		cur = None
 		if id != None:
-			cur = s.dbi.get_by_id(id)
+			cur = s.dbi_q.get_by_id(id)
 		if cur == None:
-			cur = s.dbi()
+			cur = s.dbi_q()
 		cur.id = g.get("id",None)
 		cur.screen_name = g.get("screen_name",None)
 		cur.theme = g.get("theme",None)
@@ -60,7 +60,7 @@ class q:
 		return(cur.key().id())
 
 class a:
-	class dbi(google.appengine.ext.db.Model):
+	class dbi_a(google.appengine.ext.db.Model):
 		referring_id = google.appengine.ext.db.IntegerProperty()
 		referring_screen_name = google.appengine.ext.db.StringProperty()
 		referred_id = google.appengine.ext.db.IntegerProperty()
@@ -73,7 +73,7 @@ class a:
 		return(s.id)
 
 	def get(s,id):
-		cur = s.dbi.get_by_id(id)
+		cur = s.dbi_a.get_by_id(id)
 		if cur != None:
 			r = {
 				u"referring_id":cur.referring_id,
@@ -102,9 +102,9 @@ class a:
 
 		cur = None
 		if id != None:
-			cur = s.dbi.get_by_id(id)
+			cur = s.dbi_a.get_by_id(id)
 		if cur == None:
-			cur = s.dbi()
+			cur = s.dbi_a()
 		cur.referring_id = g.get("referring_id",None)
 		cur.referring_screen_name = g.get("referring_screen_name",None)
 		cur.referring_id = g.get("referring_id",None)
