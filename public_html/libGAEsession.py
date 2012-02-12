@@ -33,6 +33,11 @@ class _:
 			else:
 				return(None)
 
+	def pop(s,k,v = None):
+		r = s.get(k,v)
+		s.set(k,None)
+		return(r)
+
 	def clear(s):
 		s.d = {}
 		return()
