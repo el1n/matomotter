@@ -5,10 +5,12 @@
 import os
 import sys
 import codecs
+import random
 import cgi
 import time
 import Cookie
 import tweepy
+import libmatomotter
 import libGAEsession
 import conf
 
@@ -19,16 +21,23 @@ def main():
 
 	sys.stdout = codecs.getwriter("utf-8")(sys.stdout) # クソ文字コード処理対策
 	cookie = Cookie.SimpleCookie(os.environ.get("HTTP_COOKIE","")) # クッキーおいしいです
+
 	session = libGAEsession.session_memcache() # セッションDB
+	db = libmatomotter.q() # 質問DB
+
 	param = cgi.FieldStorage()
-	auth = tweepy.OAuthHandler(conf.dict['consumer_key'], conf.dict['consumer_secret'], HOME_URI+"?m=callback", True) # tweepyにConsumer keyくわせる
+
+	auth = tweepy.OAuthHandler(conf.dict['consumer_key'], conf.dict['consumer_secret'], HOME_URI+"?m=callback", True) # tweepy(TwitterAPI)にConsumer keyくわせる
 	api = tweepy.API(auth)
 
 	if cookie.has_key("sessionid"): # クッキー埋め込み
 		if session.load(cookie["sessionid"].value.decode("ascii")) == None:
 			session.new()
 
-	m = param.getvalue("m","").decode("utf-8") # モード取得
+	try: # モード取得
+		m = param.getvalue("m","").decode("utf-8")
+	except: # こけたらクリアする
+		m = None
 
 	# HTTP共通ヘッダ部
 	print u"Set-Cookie: sessionid=%s; expires=%s; path=/" % (session.getid(),time.strftime("%a, %d-%b-%Y %H:%M:%S GMT",time.gmtime(time.time() + 86400)))
@@ -46,8 +55,8 @@ def main():
 			auth.set_access_token(session.get("access_key"),session.get("access_secret"))
 
 			try:
-				auth.get_username()
 				url = HOME_URI
+				auth.get_username()
 				session.set("id",api.me().id)
 				session.set("screen_name",api.me().screen_name)
 			except:
@@ -72,10 +81,11 @@ def main():
 			auth.set_access_token(session.get("access_key"),session.get("access_secret"))
 			session.set("id",api.me().id)
 			session.set("screen_name",api.me().screen_name)
-			url = HOME_URI
+			url = HOME_URI+session.get("int_cb","")
 		except:
 			url = HOME_URI+"?m=login"
 		finally:
+			
 			print u"Location:"+url
 
 		session.save()
@@ -83,27 +93,93 @@ def main():
 
 	elif m == "logout": # ログアウト処理
 
-		session.set("id",None)
-		session.set("screen_name",None)
-		session.set("access_key",None)
-		session.set("access_secret",None)
+		session.clear()
 		session.save()
 		print u"Location:"+HOME_URI
 
+
+	elif m == "make": #質問作成ペーーーーージ
+	
+		if param.getvalue("post_flg","False").decode("utf-8") == "True":
+			try: # access_keyとaccess_secretが使えるかどうか確認
+				auth.set_access_token(session.get("access_key"),session.get("access_secret"))
+				username = auth.get_username()
+				
+	
+	
+				url
+			except: # 使えなかった場合
+				q = {
+					"subject":param.getvalue("subject","").decode("utf-8"),
+					"option0":param.getvalue("option0","").decode("utf-8"),
+					"option1":param.getvalue("option1","").decode("utf-8"),
+					"option2":param.getvalue("option2","").decode("utf-8"),
+					"option3":param.getvalue("option3","").decode("utf-8")
+				}
+				session.set("q_temp",q)
+				session.set("int_cb","?m=make&post_flg=True")
+				url = HOME_URI+u""
+			finally:
+				print u"Location:"+url
+	
+			print u""
+			session.save()
+	
+	
+		else:
+	
+			print u""
+			try: # access_keyとaccess_secretが使えるかどうか確認
+				auth.set_access_token(session.get("access_key"),session.get("access_secret"))
+				username = auth.get_username()
+				user_status = u'Logged in as @' + username + "(" + str(session.get("id")).encode("utf-8") + ") "
+				login = True # 使えたらログインフラグ立つ
+			except: # 使えなかった場合
+				user_status = u'<a href="?m=login">Login</a>'
+				login = False # ログインフラグへし折る
+			finally:
+				print user_status
+				print u'<a href="?m=logout">Logout</a><br>'
+	
+			print u'<form method="POST" action="'+HOME_URI+u'?m=make">'
+			print u'<input type="hidden" name="post_flg" value="True">'
+			print u'<input type="text" name="subject" value=""><br>'
+			print u'<input type="text" name="option0" value="">'
+			print u'<input type="text" name="option1" value="">'
+			print u'<input type="text" name="option2" value="">'
+			print u'<input type="text" name="option3" value=""><br>'
+			print u'<input type="submit" value="Post">'
+			print u'</form>'
+	
+	elif m == "q": # 回答ペーーーーーージ
+		print u"質問に答えるのれす^q^"
 
 	else: # トップペーーーージ
 
 		print u""
 
-		try:
+		try: # access_keyとaccess_secretが使えるかどうか確認
 			auth.set_access_token(session.get("access_key"),session.get("access_secret"))
 			username = auth.get_username()
 			user_status = u'Logged in as @' + username + "(" + str(session.get("id")).encode("utf-8") + ") "
-		except:
+			login = True # 使えたらログインフラグ立つ
+		except: # 使えなかった場合
 			user_status = u'<a href="?m=login">Login</a>'
+			login = False # ログインフラグへし折る
 		finally:
 			print user_status
-			print u'<a href="?m=logout">Logout</a>'
+			print u'<a href="?m=logout">Logout</a><br>'
+			print u'<a href="?m=make">Make Question</a><br>'
+
+#		if login == True: # ログイン状態の時
+#			id_list = api.friends_ids() # フォロー中idを5000件上限で持ってくる
+#			users = [] # 格納用のリスト作成
+
+#			while len(users) < 10 and len(id_list) > 0: # 10件格納 or idのストックがなくなるまでルーーーープ
+#				users.append(id_list.pop(random.randint(0,len(id_list)-1))) # どんどん格納する
+
+#			for i in api._lookup_users(users):
+#				print i.screen_name+u"<br>"
 
 
 if __name__ == "__main__":
