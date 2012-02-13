@@ -65,7 +65,7 @@ class a:
 		referring_screen_name = google.appengine.ext.db.StringProperty()
 		referred_id = google.appengine.ext.db.IntegerProperty()
 		referred_screen_name = google.appengine.ext.db.StringProperty()
-		choise = google.appengine.ext.db.IntegerProperty()
+		choice = google.appengine.ext.db.IntegerProperty()
 		mtime = google.appengine.ext.db.DateTimeProperty(auto_now = True)
 		ctime = google.appengine.ext.db.DateTimeProperty(auto_now = True,auto_now_add = True)
 
@@ -80,7 +80,7 @@ class a:
 				u"referring_screen_name":cur.referring_screen_name,
 				u"referred_id":cur.referred_id,
 				u"referred_screen_name":cur.referred_screen_name,
-				u"choise":cur.choise,
+				u"choice":cur.choice,
 				u"mtime":cur.mtime,
 				u"ctime":cur.ctime
 			}
@@ -97,7 +97,7 @@ class a:
 			return(0)
 		if g.get("referring_screen_name",None) == None:
 			return(0)
-		if g.get("choise",None) == None:
+		if g.get("choice",None) == None:
 			return(0)
 
 		cur = None
@@ -109,7 +109,7 @@ class a:
 		cur.referring_screen_name = g.get("referring_screen_name",None)
 		cur.referring_id = g.get("referring_id",None)
 		cur.referring_screen_name = g.get("referring_screen_name",None)
-		cur.choise = g.get("choise",None)
+		cur.choice = g.get("choice",None)
 		cur.put()
 
 		return(cur.key().id())
