@@ -14,17 +14,17 @@ import libmatomotter
 import libGAEsession
 import conf
 
-
-HOME_URI = "http://172.22.1.129:8000/test/"
-
 def main():
 
 	cookie = Cookie.SimpleCookie(os.environ.get("HTTP_COOKIE","")) # クッキーおいしいです
 	session = libGAEsession.session_memcache() # セッションDB
-	db = libmatomotter.q() # 質問DB
+	dbq = libmatomotter.q() # 質問用DB
+	dba = libmatomotter.a() # 回答用DB
+
 
 	param = cgi.FieldStorage()
 
+	HOME_URI = conf.dict['HOME_URI']
 	auth = tweepy.OAuthHandler(conf.dict['consumer_key'], conf.dict['consumer_secret'], HOME_URI+"?m=callback", True) # tweepy(TwitterAPI)にConsumer keyくわせる
 	api = tweepy.API(auth)
 
@@ -115,7 +115,7 @@ def main():
 						"id":session.get("id"),
 						"screen_name":session.get("screen_name")
 					}
-				url = HOME_URI+u"?m=q&id="+str(db.set(q))
+				url = HOME_URI+u"?m=q&id="+str(dbq.set(q))
 			except: # 使えなかった場合
 				q = {
 					"theme":param.getvalue("theme","").decode("utf-8"),
@@ -160,14 +160,65 @@ def main():
 
 	elif m == "q": # 回答ペーーーーーージ
 		print u""
-		print u'質問に答えるのれす^q^<br>'
-		r = db.get(int(param.getvalue("id")))
-		print u"しつもん: "+r.get("theme",None)+u"<br>"
-		print u"こたえ１: "+r.get("option0",None)
-		print u"こたえ２: "+r.get("option1",None)
-		print u"こたえ３: "+r.get("option2",None)
-		print u"こたえ４: "+r.get("option3",None)
+		try: # access_keyとaccess_secretが使えるかどうか確認
+			auth.set_access_token(session.get("access_key"),session.get("access_secret"))
+			username = auth.get_username()
+			user_status = u'Logged in as @' + username + "(" + str(session.get("id")).encode("utf-8") + ") "
+			login = True # 使えたらログインフラグ立つ
+		except: # 使えなかった場合
+			user_status = u'<a href="?m=login">Login</a>'
+			login = False # ログインフラグへし折る
+		finally:
+			print user_status
+			print u'<a href="?m=logout">Logout</a><br>'
 
+		print u'質問に答えるのれす^q^<br>'
+		r = dbq.get(int(param.getvalue("id")))
+		print u"しつもん: "+r.get("theme",None)+u"<br>"
+		print u'こたえ１: <a href="?m=a&id='+param.getvalue("id")+u'&o=0">'+r.get("option0",None)+u'</a>'
+		print u'こたえ２: <a href="?m=a&id='+param.getvalue("id")+u'&o=1">'+r.get("option1",None)+u'</a>'
+		print u'こたえ３: <a href="?m=a&id='+param.getvalue("id")+u'&o=2">'+r.get("option2",None)+u'</a>'
+		print u'こたえ４: <a href="?m=a&id='+param.getvalue("id")+u'&o=3">'+r.get("option3",None)+u'</a>'
+
+	elif m == "a": # 答えた時の処理^p^
+
+		if param.getvalue("id","").decode("utf-8") == "" or  param.getvalue("o","").decode("utf-8") == "" or param.getvalue("uid","").decode("utf-8") == "":
+			print u"Location:"+HOME_URI
+
+		else:
+			try: # access_keyとaccess_secretが使えるかどうか確認
+				auth.set_access_token(session.get("access_key"),session.get("access_secret"))
+				username = auth.get_username()
+				if not session.get("a_temp",None) == None:
+					a = session.get("a_temp")
+					session.set("a_temp",None)
+					a["referring_id"] = session.get("id")
+					a["referring_screen_name"] = session.get("screen_name")
+				else:
+					a = {
+						"qid":param.getvalue("id").decode("utf-8"),
+						"referred_id":param.getvalue("uid").decode("utf-8"),
+						"referred_screen_name":(api.get_user(param.getvalue("uid").decode("utf-8"))).screen_name,
+						"choice":param.getvalue("o").decode("utf-8"),
+						"referring_id":session.get("id"),
+						"referring_screen_name":session.get("screen_name")
+					}
+				url = HOME_URI+u"?m=q&id="+str(dba.set(a))
+			except: # 使えなかった場合
+				a = {
+					"qid":param.getvalue("id").decode("utf-8"),
+					"referred_id":param.getvalue("uid").decode("utf-8"),
+					"referred_screen_name":(api.get_user(param.getvalue("uid").decode("utf-8"))).screen_name,
+					"choice":param.getvalue("o").decode("utf-8"),
+				}
+				session.set("a_temp",a)
+				session.set("int_cb","?m=a&post_flg=True")
+				url = HOME_URI+u"?m=login"
+			finally:
+				print u"Location:"+url
+
+			print u""
+			session.save()
 
 	else: # トップペーーーージ
 
@@ -186,8 +237,7 @@ def main():
 			print u'<a href="?m=logout">Logout</a><br>'
 			print u'<a href="?m=make">Make Question</a><br>'
 
-
-		print session.get("q_temp","Empty")
+		print (api.get_user(param.getvalue("uid","purin_fps").decode("utf-8"))).screen_name
 #		if login == True: # ログイン状態の時
 #			id_list = api.friends_ids() # フォロー中idを5000件上限で持ってくる
 #			users = [] # 格納用のリスト作成
