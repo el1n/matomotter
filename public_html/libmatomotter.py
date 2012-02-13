@@ -9,8 +9,8 @@ class q:
 		option1 = google.appengine.ext.db.StringProperty()
 		option2 = google.appengine.ext.db.StringProperty()
 		option3 = google.appengine.ext.db.StringProperty()
-		mtime = google.appengine.ext.db.DateTimeProperty(auto_now = True)
-		ctime = google.appengine.ext.db.DateTimeProperty(auto_now = True,auto_now_add = True)
+		mtime = google.appengine.ext.db.DateTimeProperty(auto_now = True,auto_now_add = True)
+		ctime = google.appengine.ext.db.DateTimeProperty(auto_now = True)
 
 	def getid(s):
 		return(s.id)
@@ -61,13 +61,14 @@ class q:
 
 class a:
 	class dbi_a(google.appengine.ext.db.Model):
+		qid = google.appengine.ext.db.IntegerProperty()
 		referring_id = google.appengine.ext.db.IntegerProperty()
 		referring_screen_name = google.appengine.ext.db.StringProperty()
 		referred_id = google.appengine.ext.db.IntegerProperty()
 		referred_screen_name = google.appengine.ext.db.StringProperty()
 		choice = google.appengine.ext.db.IntegerProperty()
-		mtime = google.appengine.ext.db.DateTimeProperty(auto_now = True)
-		ctime = google.appengine.ext.db.DateTimeProperty(auto_now = True,auto_now_add = True)
+		mtime = google.appengine.ext.db.DateTimeProperty(auto_now = True,auto_now_add = True)
+		ctime = google.appengine.ext.db.DateTimeProperty(auto_now = True)
 
 	def getid(s):
 		return(s.id)
@@ -76,6 +77,7 @@ class a:
 		cur = s.dbi_a.get_by_id(id)
 		if cur != None:
 			r = {
+				u"qid":cur.qid,
 				u"referring_id":cur.referring_id,
 				u"referring_screen_name":cur.referring_screen_name,
 				u"referred_id":cur.referred_id,
@@ -89,6 +91,8 @@ class a:
 			return(None)
 
 	def set(s,g,id = None):
+		if g.get("qid",None) == None:
+			return(0)
 		if g.get("referring_id",None) == None:
 			return(0)
 		if g.get("referring_screen_name",None) == None:

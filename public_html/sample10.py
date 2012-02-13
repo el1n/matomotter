@@ -15,7 +15,7 @@ import libGAEsession
 import conf
 
 
-HOME_URI = "http://localhost:8080/test/"
+HOME_URI = "http://172.22.1.129:8000/test/"
 
 def main():
 
