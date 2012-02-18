@@ -96,7 +96,7 @@ def main():
 
 
 	elif m == "make": #質問作成ペーーーーージ
-		if param.getvalue("post_flg","False").decode("utf-8") == "True":
+		if param.getvalue("post_flg","0").decode("utf-8"):
 			try: # access_keyとaccess_secretが使えるかどうか確認
 				auth.set_access_token(session.get("access_key"),session.get("access_secret"))
 				username = auth.get_username()
@@ -125,7 +125,7 @@ def main():
 					"option3":param.getvalue("option3","").decode("utf-8")
 				}
 				session.set("q_temp",q)
-				session.set("int_cb","?m=make&post_flg=True")
+				session.set("int_cb","?m=make&post_flg=1")
 				url = HOME_URI+u"?m=login"
 			finally:
 				print u"Location:"+url
@@ -182,7 +182,10 @@ def main():
 
 	elif m == "a": # 答えた時の処理^p^
 
-		if param.getvalue("id","").decode("utf-8") == "" or  param.getvalue("o","").decode("utf-8") == "" or param.getvalue("uid","").decode("utf-8") == "":
+		if param.getvalue("post_flg","0").decode("utf-8"):
+			
+
+		elif param.getvalue("id","").decode("utf-8") == "" or  param.getvalue("o","").decode("utf-8") == "" or param.getvalue("uid","").decode("utf-8") == "":
 			print u"Location:"+HOME_URI
 
 		else:
@@ -212,7 +215,7 @@ def main():
 					"choice":param.getvalue("o").decode("utf-8"),
 				}
 				session.set("a_temp",a)
-				session.set("int_cb","?m=a&post_flg=True")
+				session.set("int_cb","?m=a&post_flg=1")
 				url = HOME_URI+u"?m=login"
 			finally:
 				print u"Location:"+url
@@ -237,7 +240,7 @@ def main():
 			print u'<a href="?m=logout">Logout</a><br>'
 			print u'<a href="?m=make">Make Question</a><br>'
 
-		print (api.get_user(param.getvalue("uid","purin_fps").decode("utf-8"))).screen_name
+#		print (api.get_user(param.getvalue("uid","purin_fps").decode("utf-8"))).screen_name
 #		if login == True: # ログイン状態の時
 #			id_list = api.friends_ids() # フォロー中idを5000件上限で持ってくる
 #			users = [] # 格納用のリスト作成
