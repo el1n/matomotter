@@ -5,8 +5,9 @@
 import sys
 
 dict = {
-'consumer_key' : 'WsgAzyPtjNmiRd3F9cVW9w',
-'consumer_secret' : 'G7HH3NYFfWMggzpM1cH0eJtBtI0U4G0QpgWvwvrLpcY',
+	'consumer_key' : 'WsgAzyPtjNmiRd3F9cVW9w',
+	'consumer_secret' : 'G7HH3NYFfWMggzpM1cH0eJtBtI0U4G0QpgWvwvrLpcY',
+	'HOME_URI' : 'http://localhost:8080/main/',
 }
 
 stdin = sys.stdin

@@ -37,3 +37,6 @@ handlers:
 
 - url: /test/
   script: sample10.py
+
+- url: /main/
+  script: main.py
