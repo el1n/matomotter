@@ -37,6 +37,11 @@ def get_userlist(access_key,access_secret,uid):
 		return_friends.append(i) # どんどん格納する
 	return return_friends
 
+def get_user(uid):
+	auth = tweepy.OAuthHandler(conf.dict['consumer_key'], conf.dict['consumer_secret']) # tweepy(TwitterAPI)にConsumer keyくわせる
+	api = tweepy.API(auth)
+	return api.lookup_users([uid])[0]
+
 def main():
 
 	HOME_URI = conf.dict['HOME_URI']
@@ -96,11 +101,21 @@ def main():
 				m = "blank"
 				session.save()
 
+		elif in_mode[0] == "post_a": # 質問投稿
+			if session.get("id",None):
+				a_list = session.get("a_list")
+				for i in a_list:
+					i["referring_id"] = session.get("id")
+					i["referring_screen_name"] = session.get("screen_name")
+					dba.set(i)
+				print u"Location:"+HOME_URI
+
 		elif in_mode[0] == "return_page": # もどれ
 			if session.get("id",None):
 				session.set("in_mode",in_mode[1:])
 				print u"Location:"+HOME_URI+u"?"+session.get("return_to")
 				m = "blank"
+				session.set("return_to",None)
 				session.save()
 
 	# 外部モード処理開始
@@ -173,34 +188,73 @@ def main():
 			print u'質問に答えるのれす^q^<br>'
 			print u"しつもん: "+r.get("theme",None)+u"<br>"
 			print u'<form method="post" action="?m=a&id='+param.getvalue("id")+u'">'
+			q_tgt = {}
 			for i in get_userlist(session.get("access_key"),session.get("access_secret"),param.getvalue("uid",None)):
 				print i.screen_name+u'さん'
 				c = 0
 				for i2 in o:
-					print u'<input type="radio" name="'+i.screen_name+'" value="'+str(c).encode("utf-8")+'">'+i2
+					print u'<input type="radio" name="'+str(i.id).encode("utf-8")+'" value="'+str(c).encode("utf-8")+'">'+i2
 					c = c + 1
 				print u'<br>'
+				q_tgt[i.id] = i.screen_name
+			session.set("q_tgt",q_tgt)
 			print u'<input value="Answer!" type="submit">'
 			print u'</form>'
 
-
 		else:
-
+			r = dbq.get(int(param.getvalue("id")))
+			o = (r.get("option0",None),r.get("option1",None),r.get("option2",None),r.get("option3",None))
 			print u""
 			print login_status(session.get("screen_name",""))+u"<br>"
 			print u'質問に答えるのれす^q^<br>'
-			r = dbq.get(int(param.getvalue("id")))
 			print u"しつもん: "+r.get("theme",None)+u"<br>"
 			print u'<form method="post" action="?m=a&id='+param.getvalue("id")+u'">'
-			print u'<input name="0" value="'+r.get("option0",None)+u'" type="submit">'
-			print u'<input name="1" value="'+r.get("option1",None)+u'" type="submit">'
-			print u'<input name="2" value="'+r.get("option2",None)+u'" type="submit">'
-			print u'<input name="3" value="'+r.get("option3",None)+u'" type="submit">'
+			i = get_user(param.getvalue("uid"))
+			print i.screen_name+u'さん'
+			c = 0
+			for i2 in o:
+				print u'<input type="radio" name="'+str(i.id).encode("utf-8")+'" value="'+str(c).encode("utf-8")+'">'+i2
+				c = c + 1
+			q_tgt[i.id] = i.screen_name
+			session.set("q_tgt",q_tgt)
+			print u'<br>'
+			print u'<input value="Answer!" type="submit">'
 			print u'</form>'
 
+		session.save()
+			
 	elif m == "a": # 回答処理
-		print param
-		print os.environ['QUERY_STRING']
+		q_tgt = session.get("q_tgt",None)
+		qid = param.getvalue("id",None)
+		if q_tgt and qid:
+			a_list = []
+			for i in q_tgt.keys():
+				if param.getvalue(str(i),None):
+					a = {
+						"qid":qid,
+						"referred_id":i,
+						"referred_screen_name":q_tgt.get(i),
+						"choice":int(param.getvalue(str(i)))
+					}
+					a_list.append(a)
+
+			if session.get("id",None):
+				for i in a_list:
+					i["referring_id"] = session.get("id")
+					i["referring_screen_name"] = session.get("screen_name")
+					dba.set(i)
+				url = HOME_URI+u"?m=q&id="+str(qid).encode("utf-8")
+			else:
+				session.set("a_list",a_list)
+				session.set("return_to","?m=q&id="+str(qid))
+				session.set("in_mode",("post_a","return_page"))
+				url = HOME_URI+u"?m=login"
+
+			print u"Location:"+url
+
+		else:
+			print u"Location:"+HOME_URI
+
 #		if session.get("id",None):
 #			a = {
 #				
