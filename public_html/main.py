@@ -209,6 +209,7 @@ def main():
 			print u'質問に答えるのれす^q^<br>'
 			print u"しつもん: "+r.get("theme",None)+u"<br>"
 			print u'<form method="post" action="?m=a&id='+param.getvalue("id")+u'">'
+			q_tgt = {}
 			i = get_user(param.getvalue("uid"))
 			print i.screen_name+u'さん'
 			c = 0
