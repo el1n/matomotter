@@ -101,14 +101,17 @@ def main():
 				m = "blank"
 				session.save()
 
-		elif in_mode[0] == "post_a": # 質問投稿
+		elif in_mode[0] == "post_a": # 回答投稿
 			if session.get("id",None):
 				a_list = session.get("a_list")
 				for i in a_list:
 					i["referring_id"] = session.get("id")
 					i["referring_screen_name"] = session.get("screen_name")
 					dba.set(i)
+				m = "blank"
+				session.set("in_mode",in_mode[1:])
 				print u"Location:"+HOME_URI
+				session.save()
 
 		elif in_mode[0] == "return_page": # もどれ
 			if session.get("id",None):
@@ -247,11 +250,12 @@ def main():
 				url = HOME_URI+u"?m=q&id="+str(qid).encode("utf-8")
 			else:
 				session.set("a_list",a_list)
-				session.set("return_to","?m=q&id="+str(qid))
+				session.set("return_to","m=q&id="+str(qid))
 				session.set("in_mode",("post_a","return_page"))
 				url = HOME_URI+u"?m=login"
 
 			print u"Location:"+url
+			session.save()
 
 		else:
 			print u"Location:"+HOME_URI
