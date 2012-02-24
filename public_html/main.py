@@ -22,23 +22,27 @@ def login_status(screen_name):
 	return r
 
 def get_userlist(access_key,access_secret,uid):
-	auth = tweepy.OAuthHandler(conf.dict['consumer_key'], conf.dict['consumer_secret']) # tweepy(TwitterAPI)にConsumer keyくわせる
-	auth.set_access_token(access_key,access_secret)
-	api = tweepy.API(auth)
-	id_list = api.friends_ids()
-	users = []
-	if uid:
-		users.append(uid)
-		try:
-			id_list.remove(uid)
-		except:
-			pass
-	return_friends = []
-	while len(users) < 5 and len(id_list) > 0: # 5件格納 or idのストックがなくなるまでルーーーープ
-		users.append(id_list.pop(random.randint(0,len(id_list)-1))) # どんどん格納する
-	for i in api.lookup_users(users):
-		return_friends.append(i) # どんどん格納する
-	return return_friends
+	if access_key and access_secret:
+		auth = tweepy.OAuthHandler(conf.dict['consumer_key'], conf.dict['consumer_secret']) # tweepy(TwitterAPI)にConsumer keyくわせる
+		users = []
+		id_list = {}
+		auth.set_access_token(access_key,access_secret)
+		api = tweepy.API(auth)
+		id_list = api.friends_ids()
+		if uid:
+			users.append(uid)
+			try:
+				id_list.remove(uid)
+			except:
+				pass
+		return_friends = []
+		while len(users) < 5 and len(id_list) > 0: # 5件格納 or idのストックがなくなるまでルーーーープ
+			users.append(id_list.pop(random.randint(0,len(id_list)-1))) # どんどん格納する
+		for i in api.lookup_users(users):
+			return_friends.append(i) # どんどん格納する
+		return return_friends
+	else:
+		return [get_user(uid)]
 
 def get_user(uid):
 	auth = tweepy.OAuthHandler(conf.dict['consumer_key'], conf.dict['consumer_secret']) # tweepy(TwitterAPI)にConsumer keyくわせる
@@ -82,7 +86,10 @@ def main():
 		"error_make_desc":"",
 		"error_make_option0":"",
 		"error_make_option1":"",
+		"param_q_id":"",
+		"param_q_uid":"",
 		"param_q_options":[],
+		"param_q_tgt":[],
 		}
 
 
@@ -153,16 +160,12 @@ def main():
 	if m == "blank": # 空白
 		sys.exit()
 
-	elif m == "test":
-		tmpl_args["tmpl_title"] = u"てすと"
-		tmpl_args["tmpl_text"] = u"てすとったー"
-
 	elif m == "login": # ログイン処理
 		url = auth.get_authorization_url()
 		session.set("token_secret", auth.request_token.secret)
 		session.set("in_mode",("callback",)+session.get("in_mode",()))
-		print u"Location:"+url
 		session.save()
+		print(u"Location:"+url)
 		sys.exit()
 
 	elif m == "logout": # ログアウト処理
@@ -201,9 +204,8 @@ def main():
 				session.set("temp_q",q)
 				session.set("in_mode",("post_q",))
 				url = HOME_URI+u"?m=login"
-
-			print u"Location:"+url
 			session.save()
+			print u"Location:"+url
 			sys.exit()
 
 		elif param.getvalue("post_flg","").decode("utf-8"):
@@ -220,7 +222,7 @@ def main():
 			tmpl_args["param_make_option0"] = param.getvalue("option0","").decode("utf-8")
 			tmpl_args["param_make_option1"] = param.getvalue("option1","").decode("utf-8")
 			tmpl_args["param_make_option2"] = param.getvalue("option2","").decode("utf-8")
-			tmpl_args["param_make_option3"] = param.getvalue("option3","").decode("utf-8")			
+			tmpl_args["param_make_option3"] = param.getvalue("option3","").decode("utf-8")
 		else:
 			pass
 
@@ -231,68 +233,22 @@ def main():
 			session.set("in_mode",("return_page",))
 			print u"Location:"+HOME_URI+u"?m=login"
 			sys.exit()
-		elif session.get("id",None): # ログインはしてるけど対象者(uid)ない
-			r = dbq.get(int(param.getvalue("id")))
+		else: # ログインしてる or 対象者(uid)いる
+			r = dbq.get(int(param.getvalue("id").decode("utf-8")))
 			tmpl_args["text"] = r.get("theme",None)
-			tmpl_args["param_q_options"] = [r.get("option0",None),r.get("option1",None),r.get("option2",None),r.get("option3",None)]
-			print u'<form method="post" action="?m=a&id='+param.getvalue("id")+u'">'
+			tmpl_args["param_q_id"] = param.getvalue("id").decode("utf-8")
+			tmpl_args["param_q_uid"] = param.getvalue("uid","").decode("utf-8")
+			for i in (r.get("option0",""),r.get("option1",""),r.get("option2",""),r.get("option3","")):
+				if i == "":
+					break
+				tmpl_args["param_q_options"].append(i)
 			q_tgt = {}
-			for i in get_userlist(session.get("access_key"),session.get("access_secret"),param.getvalue("uid",None)):
-				print i.screen_name+u'さん'
-				c = 0
-				for i2 in tmpl_args["param_q_options"]:
-					print u'<input type="radio" name="'+str(i.id).encode("utf-8")+'" value="'+str(c).encode("utf-8")+'">'+i2
-					c = c + 1
-				print u'<br>'
+			for i in get_userlist(session.get("access_key",None),session.get("access_secret",None),tmpl_args["param_q_uid"]):
 				q_tgt[i.id] = i.screen_name
+			tmpl_args["param_q_tgt"] = q_tgt
 			session.set("q_tgt",q_tgt)
-
-
-##			r = dbq.get(int(param.getvalue("id")))
-##			o = (r.get("option0",None),r.get("option1",None),r.get("option2",None),r.get("option3",None))
-##			print u""
-##			print login_status(session.get("screen_name",""))+u"<br>"
-##			print u'質問に答えるのれす^q^<br>'
-##			print u"しつもん: "+r.get("theme",None)+u"<br>"
-##			print u'<form method="post" action="?m=a&id='+param.getvalue("id")+u'">'
-##			q_tgt = {}
-##			for i in get_userlist(session.get("access_key"),session.get("access_secret"),param.getvalue("uid",None)):
-##				print i.screen_name+u'さん'
-##				c = 0
-##				for i2 in o:
-##					print u'<input type="radio" name="'+str(i.id).encode("utf-8")+'" value="'+str(c).encode("utf-8")+'">'+i2
-##					c = c + 1
-##				print u'<br>'
-##				q_tgt[i.id] = i.screen_name
-##			session.set("q_tgt",q_tgt)
-##			print u'<input value="Answer!" type="submit">'
-##			print u'</form>'
-
-		else: # ログインしてるし対象者(uid)もいる
-			pass
-		
-##			r = dbq.get(int(param.getvalue("id")))
-##			o = (r.get("option0",None),r.get("option1",None),r.get("option2",None),r.get("option3",None))
-##			print u""
-##			print login_status(session.get("screen_name",""))+u"<br>"
-##			print u'質問に答えるのれす^q^<br>'
-##			print u"しつもん: "+r.get("theme",None)+u"<br>"
-##			print u'<form method="post" action="?m=a&id='+param.getvalue("id")+u'">'
-##			q_tgt = {}
-##			i = get_user(param.getvalue("uid"))
-##			print i.screen_name+u'さん'
-##			c = 0
-##			for i2 in o:
-##				print u'<input type="radio" name="'+str(i.id).encode("utf-8")+'" value="'+str(c).encode("utf-8")+'">'+i2
-##				c = c + 1
-##			q_tgt[i.id] = i.screen_name
-##			session.set("q_tgt",q_tgt)
-##			print u'<br>'
-##			print u'<input value="Answer!" type="submit">'
-##			print u'</form>'
-
 		session.save()
-			
+
 	elif m == "a": # 回答処理
 		q_tgt = session.get("q_tgt",None)
 		qid = param.getvalue("id",None)
@@ -319,18 +275,15 @@ def main():
 				session.set("return_to","m=q&id="+str(qid))
 				session.set("in_mode",("post_a","return_page"))
 				url = HOME_URI+u"?m=login"
-
-			print u"Location:"+url
 			session.save()
+			print u"Location:"+url
+			sys.exit()
 
 		else:
-			print u"Location:"+HOME_URI
+			pass
 
 	else: # デフォルト（トップページ）
-		print u""
-##		print login_status(session.get("screen_name",""))+u"<br>"
-##		print u"トップペーーーーージ＾ｑ＾"
-##		print u'<a href="?m=make">Make Question</a><br>'
+		pass
 
 
 	# makoちゃん設定部
