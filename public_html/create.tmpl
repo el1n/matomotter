@@ -1,0 +1,75 @@
+<%include file="header.tmpl"/>
+
+		<div id="main" role="main">
+			<div id="content">
+				<section>
+					<section class="entry-content">
+						<div class="marquee">
+							<h3><span>質問を作成する</span></h3>
+							<form method="post" action="?m=make">
+							<input type="hidden" name="post_flg" value="1">
+                            <div class="question_form">
+                            	<br />
+                            	<dl>
+                           		  <dt><span class="red">■</span> 作成者</dt>
+                           		  <dd>${screen_name}
+                                  </dd>
+                            	</dl>
+                            </div>
+                            <div class="question_form">
+                            	<dl>
+                            		<dt><span class="yellow">■</span> タイトル <span class="bit">*</span></dt>
+                            		<dd>
+										<input type="text" value="${param_make_theme}" maxlength="30" name="theme" autocomplete="off" id="01" style="width: 15em" class="form1"> ${error_make_theme}
+                                    </dd>
+                            	</dl>
+                            </div>
+                            <div class="question_form">
+                            	<dl>
+                            		<dt><span class="green">■</span> 説明文 <span class="bit">*</span></dt>
+                            		<dd>
+									  <input type="text" value="${param_make_desc}" maxlength="30" name="desc" autocomplete="off" id="02" style="width: 15em" class="form2"> ${error_make_desc}
+                                    </dd>
+                            	</dl>
+                            </div>
+                            <div class="question_form">
+                            	<dl>
+                            		<dt><span class="blue">■</span> 選択肢１ <span class="bit">*</span></dt>
+                            		<dd>
+										<input type="text" value="${param_make_option0}" maxlength="30" name="option0" autocomplete="off" id="03" style="width: 15em" class="form2"> ${error_make_option0}
+                                    </dd>
+                            	</dl>
+                            </div>
+                            <div class="question_form">
+                            	<dl>
+                            		<dt><span class="blue">■</span> 選択肢２ <span class="bit">*</span></dt>
+                            		<dd>
+										<input type="text" value="${param_make_option1}" maxlength="30" name="option1" autocomplete="off" id="04" style="width: 15em" class="form2"> ${error_make_option1}
+                                    </dd>
+                            	</dl>
+                            </div>
+                            <div class="question_form">
+                            	<dl>
+                            		<dt><span class="blue">■</span> 選択肢３</dt>
+                            		<dd>
+										<input type="text" value="${param_make_option2}" maxlength="30" name="option2" autocomplete="off" id="05" style="width: 15em" class="form2">
+                                    </dd>
+                            	</dl>
+                            </div>
+                            <div class="question_form">
+                            	<dl>
+                            		<dt><span class="blue">■</span> 選択肢４</dt>
+                            		<dd>
+										<input type="text" value="${param_make_option3}" maxlength="30" name="option3" autocomplete="off" id="06" style="width: 15em" class="form2">
+                                    </dd>
+                            	</dl>
+                            </div>
+                            <div class="question_ok"><input type="image" src="img/ok-btns_red.png" width="131" height="131" alt="確認する"></div>
+						</form>
+						</div>
+					</section>
+				</section>
+			</div>
+		</div>
+
+<%include file="footer.tmpl"/>

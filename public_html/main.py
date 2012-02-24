@@ -2,11 +2,14 @@
 # -*- coding: utf-8 -*-
 
 import os
+import sys
 import random
 import cgi
 import time
 import Cookie
 import tweepy
+import mako.template
+import mako.lookup
 import libmatomotter
 import libGAEsession
 import conf
@@ -54,9 +57,34 @@ def main():
 	auth = tweepy.OAuthHandler(conf.dict['consumer_key'], conf.dict['consumer_secret'], HOME_URI, True) # tweepy(TwitterAPI)にConsumer keyくわせる
 	api = tweepy.API(auth)
 
-	if cookie.has_key("sessionid"): # クッキー埋め込み
+	# クッキー埋め込み
+	if cookie.has_key("sessionid"):
 		if session.load(cookie["sessionid"].value.decode("ascii")) == None:
 			session.new()
+
+	# makoちゃんに渡すパラメータ初期化
+	tmpl_file = "main.tmpl" # 無指定の場合はmain.tmplを読みにいこう
+	tmpl_args = {
+		"title":"",
+		"text":u"誰かに質問する→誰かについて答える→競え!!",
+		"screen_name":session.get("screen_name",""),
+		"profile_image":"",
+		"user_list":"",
+		"question":"",
+		"answer":"",
+		"param_make_theme":"",
+		"param_make_desc":"",
+		"param_make_option0":"",
+		"param_make_option1":"",
+		"param_make_option2":"",
+		"param_make_option3":"",
+		"error_make_theme":"",
+		"error_make_desc":"",
+		"error_make_option0":"",
+		"error_make_option1":"",
+		"param_q_options":[],
+		}
+
 
 	# HTTP共通ヘッダ部
 	print u"Set-Cookie: sessionid=%s; expires=%s; path=/" % (session.getid(),time.strftime("%a, %d-%b-%Y %H:%M:%S GMT",time.gmtime(time.time() + 86400)))
@@ -123,7 +151,11 @@ def main():
 
 	# 外部モード処理開始
 	if m == "blank": # 空白
-		print u""
+		sys.exit()
+
+	elif m == "test":
+		tmpl_args["tmpl_title"] = u"てすと"
+		tmpl_args["tmpl_text"] = u"てすとったー"
 
 	elif m == "login": # ログイン処理
 		url = auth.get_authorization_url()
@@ -131,14 +163,21 @@ def main():
 		session.set("in_mode",("callback",)+session.get("in_mode",()))
 		print u"Location:"+url
 		session.save()
+		sys.exit()
 
 	elif m == "logout": # ログアウト処理
 		session.clear()
 		session.save()
 		print u"Location:"+HOME_URI
+		sys.exit()
 
 	elif m == "make": # 質問作成ペーーーージ
-		if param.getvalue("post_flg","").decode("utf-8"):
+		tmpl_file = "create.tmpl"
+		if (param.getvalue("post_flg","").decode("utf-8")
+		    and param.getvalue("theme","").decode("utf-8")
+		    and param.getvalue("option0","").decode("utf-8")
+		    and param.getvalue("option1","").decode("utf-8")
+		    ):
 			if session.get("id",None):
 				q = {
 					"theme":param.getvalue("theme","").decode("utf-8"),
@@ -165,65 +204,92 @@ def main():
 
 			print u"Location:"+url
 			session.save()
+			sys.exit()
 
+		elif param.getvalue("post_flg","").decode("utf-8"):
+			if not param.getvalue("theme","").decode("utf-8"):
+				tmpl_args["error_make_theme"] = u"<br><b>タイトルを入力して下さい。</b>"
+			if not param.getvalue("desc","").decode("utf-8"):
+				tmpl_args["error_make_desc"] = u"<br><b>説明文を入力して下さい。</b>"
+			if not param.getvalue("option0","").decode("utf-8"):
+				tmpl_args["error_make_option0"] = u"<br><b>選択肢1を入力して下さい。</b>"
+			if not param.getvalue("option1","").decode("utf-8"):
+				tmpl_args["error_make_option1"] = u"<br><b>選択肢2を入力して下さい。</b>"
+			tmpl_args["param_make_theme"] = param.getvalue("theme","").decode("utf-8")
+			tmpl_args["param_make_desc"] = param.getvalue("desc","").decode("utf-8")
+			tmpl_args["param_make_option0"] = param.getvalue("option0","").decode("utf-8")
+			tmpl_args["param_make_option1"] = param.getvalue("option1","").decode("utf-8")
+			tmpl_args["param_make_option2"] = param.getvalue("option2","").decode("utf-8")
+			tmpl_args["param_make_option3"] = param.getvalue("option3","").decode("utf-8")			
 		else:
-			print login_status(session.get("screen_name",""))+u"<br>"
-			print u'<form method="post" action="?m=make">'
-			print u'<input type="hidden" name="post_flg" value="1">'
-			print u'<input type="text" name="theme" value=""><br>'
-			print u'<input type="text" name="option0" value="">'
-			print u'<input type="text" name="option1" value="">'
-			print u'<input type="text" name="option2" value="">'
-			print u'<input type="text" name="option3" value=""><br>'
-			print u'<input type="submit" value="Post">'
-			print u'</form>'
+			pass
 
 	elif m == "q": # 回答ペーーーーーージ
-		if not session.get("id",None) and not param.getvalue("uid",None):
+		tmpl_file = "answer.tmpl"
+		if not session.get("id",None) and not param.getvalue("uid",None): # ログインしてないし対象者も無い
 			session.set("return_to",os.environ['QUERY_STRING'])
 			session.set("in_mode",("return_page",))
 			print u"Location:"+HOME_URI+u"?m=login"
-		elif session.get("id",None):
+			sys.exit()
+		elif session.get("id",None): # ログインはしてるけど対象者(uid)ない
 			r = dbq.get(int(param.getvalue("id")))
-			o = (r.get("option0",None),r.get("option1",None),r.get("option2",None),r.get("option3",None))
-			print u""
-			print login_status(session.get("screen_name",""))+u"<br>"
-			print u'質問に答えるのれす^q^<br>'
-			print u"しつもん: "+r.get("theme",None)+u"<br>"
+			tmpl_args["text"] = r.get("theme",None)
+			tmpl_args["param_q_options"] = [r.get("option0",None),r.get("option1",None),r.get("option2",None),r.get("option3",None)]
 			print u'<form method="post" action="?m=a&id='+param.getvalue("id")+u'">'
 			q_tgt = {}
 			for i in get_userlist(session.get("access_key"),session.get("access_secret"),param.getvalue("uid",None)):
 				print i.screen_name+u'さん'
 				c = 0
-				for i2 in o:
+				for i2 in tmpl_args["param_q_options"]:
 					print u'<input type="radio" name="'+str(i.id).encode("utf-8")+'" value="'+str(c).encode("utf-8")+'">'+i2
 					c = c + 1
 				print u'<br>'
 				q_tgt[i.id] = i.screen_name
 			session.set("q_tgt",q_tgt)
-			print u'<input value="Answer!" type="submit">'
-			print u'</form>'
 
-		else:
-			r = dbq.get(int(param.getvalue("id")))
-			o = (r.get("option0",None),r.get("option1",None),r.get("option2",None),r.get("option3",None))
-			print u""
-			print login_status(session.get("screen_name",""))+u"<br>"
-			print u'質問に答えるのれす^q^<br>'
-			print u"しつもん: "+r.get("theme",None)+u"<br>"
-			print u'<form method="post" action="?m=a&id='+param.getvalue("id")+u'">'
-			q_tgt = {}
-			i = get_user(param.getvalue("uid"))
-			print i.screen_name+u'さん'
-			c = 0
-			for i2 in o:
-				print u'<input type="radio" name="'+str(i.id).encode("utf-8")+'" value="'+str(c).encode("utf-8")+'">'+i2
-				c = c + 1
-			q_tgt[i.id] = i.screen_name
-			session.set("q_tgt",q_tgt)
-			print u'<br>'
-			print u'<input value="Answer!" type="submit">'
-			print u'</form>'
+
+##			r = dbq.get(int(param.getvalue("id")))
+##			o = (r.get("option0",None),r.get("option1",None),r.get("option2",None),r.get("option3",None))
+##			print u""
+##			print login_status(session.get("screen_name",""))+u"<br>"
+##			print u'質問に答えるのれす^q^<br>'
+##			print u"しつもん: "+r.get("theme",None)+u"<br>"
+##			print u'<form method="post" action="?m=a&id='+param.getvalue("id")+u'">'
+##			q_tgt = {}
+##			for i in get_userlist(session.get("access_key"),session.get("access_secret"),param.getvalue("uid",None)):
+##				print i.screen_name+u'さん'
+##				c = 0
+##				for i2 in o:
+##					print u'<input type="radio" name="'+str(i.id).encode("utf-8")+'" value="'+str(c).encode("utf-8")+'">'+i2
+##					c = c + 1
+##				print u'<br>'
+##				q_tgt[i.id] = i.screen_name
+##			session.set("q_tgt",q_tgt)
+##			print u'<input value="Answer!" type="submit">'
+##			print u'</form>'
+
+		else: # ログインしてるし対象者(uid)もいる
+			pass
+		
+##			r = dbq.get(int(param.getvalue("id")))
+##			o = (r.get("option0",None),r.get("option1",None),r.get("option2",None),r.get("option3",None))
+##			print u""
+##			print login_status(session.get("screen_name",""))+u"<br>"
+##			print u'質問に答えるのれす^q^<br>'
+##			print u"しつもん: "+r.get("theme",None)+u"<br>"
+##			print u'<form method="post" action="?m=a&id='+param.getvalue("id")+u'">'
+##			q_tgt = {}
+##			i = get_user(param.getvalue("uid"))
+##			print i.screen_name+u'さん'
+##			c = 0
+##			for i2 in o:
+##				print u'<input type="radio" name="'+str(i.id).encode("utf-8")+'" value="'+str(c).encode("utf-8")+'">'+i2
+##				c = c + 1
+##			q_tgt[i.id] = i.screen_name
+##			session.set("q_tgt",q_tgt)
+##			print u'<br>'
+##			print u'<input value="Answer!" type="submit">'
+##			print u'</form>'
 
 		session.save()
 			
@@ -260,21 +326,34 @@ def main():
 		else:
 			print u"Location:"+HOME_URI
 
-#		if session.get("id",None):
-#			a = {
-#				
-#				"qid":param.getvalue("id").decode("utf-8"),
-#				"referred_id":param.getvalue("uid").decode("utf-8"),
-#				"referred_screen_name":(api.get_user(param.getvalue("uid").decode("utf-8"))).screen_name,
-#				"choice":o,
-#				"referring_id":session.get("id"),
-#				"referring_screen_name":session.get("screen_name")
-#				}
-#			url = HOME_URI+u"?m=q&id="+str(dbq.set())
-
-
 	else: # デフォルト（トップページ）
 		print u""
-		print login_status(session.get("screen_name",""))+u"<br>"
-		print u"トップペーーーーージ＾ｑ＾"
-		print u'<a href="?m=make">Make Question</a><br>'
+##		print login_status(session.get("screen_name",""))+u"<br>"
+##		print u"トップペーーーーージ＾ｑ＾"
+##		print u'<a href="?m=make">Make Question</a><br>'
+
+
+	# makoちゃん設定部
+	tmpl_lookup = mako.lookup.TemplateLookup(directories=['./'])
+	tmpl_file = "./"+tmpl_file
+	tmpl = mako.template.Template(
+		filename=tmpl_file,
+		input_encoding="utf-8",
+		output_encoding="utf-8",
+		encoding_errors="replace",
+		lookup = tmpl_lookup
+		)
+
+	# makoちゃん後処理
+	if tmpl_args["title"]:
+		tmpl_args["title"] += u" - "
+	if tmpl_args["screen_name"]:
+		tmpl_args["screen_name"] = u"@"+tmpl_args["screen_name"]
+	else:
+		tmpl_args["screen_name"] = u"ゲストさん (未認証)"
+
+	# makoさんおねがいします！
+	print tmpl.render(**tmpl_args)
+
+if name == '__main__':
+	sys.exit(main())
