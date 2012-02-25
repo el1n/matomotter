@@ -1,0 +1,453 @@
+@font-face {
+    font-family: 'HuiFontPRegular';
+    src: url(../font/HuiFontP29.eot);/* IE */
+}
+ 
+@font-face {
+    font-family: 'HuiFontPRegular';
+    src: local('HuiFontP Regular'), /*フォントがローカルにインストールされている時の指定*/
+         local('HuiFontP'),
+         url('../font/HuiFontP29.ttf') format('truetype'); /* Safari、Chrome、Firefox、Opera */
+		 
+		 
+}
+@font-face {
+    font-family: 'Fredericka the Great';
+    src: url(../font/FrederickatheGreat-Regular.eot);/* IE */
+}
+ 
+@font-face {
+    font-family: 'Fredericka the Great';
+    src: local('FrederickatheGreat Regular'), /*フォントがローカルにインストールされている時の指定*/
+         local('Fredericka the Great'),
+         url('../font/FrederickatheGreat-Regular.ttf') format('truetype'); /* Safari、Chrome、Firefox、Opera */
+}
+
+
+html {
+	overflow-y : scroll;
+	background: #ecedef url(../img/body-bg.png) repeat -50% 0 fixed;
+}
+
+body {
+	color: #3c3c3c;
+	font-family: 'PT Sans Regular', 'MuseoSans500', Helvetica, Arial, sans-serif;
+	font-size: 100%;
+	font-size-adjust:0.5; 
+	font-weight:normal; 
+	font-style:normal;
+	padding: 0;
+	border-top: 1px solid #fff;
+	-webkit-font-smoothing: antialiased;
+	position: relative;
+}
+
+
+h1,h2,h3,h4,h5,h6 { font-family:'LeagueGothicRegular', Helvetica, Arial, sans-serif; text-transform:uppercase; color:#39444a; font-weight: normal; text-shadow: 1px 1px 0 #fff; margin: 0;}
+h1 { font-size:75px; margin: 0 0 8px 0; }
+h2 { font-size:55px; margin: 0 0 8px 0; }
+h3 {
+	font-size:30px;
+	margin-bottom: 8px;
+}
+h2.section-head {
+	font-family: 'PT Sans Regular', 'MuseoSans500', Helvetica, Arial, sans-serif;
+	font-size: 11px;
+	color: #969696;
+	margin-bottom: 35px;
+	}
+h1.portfolio-title { 
+	max-width: 512px; 
+	}
+h1.loop-title {
+	font-family: 'PT Sans Regular', 'MuseoSans500', Helvetica, Arial, sans-serif; 
+	text-transform: uppercase; 
+	font-size: 11px;
+	margin-bottom: 24px; 
+	} 
+p {
+	font-size: 16px; 
+	line-height: 24px;
+	margin-bottom: 24px;
+	margin-top: 0;
+	}	
+ul.special, ul.cons, ul.pros, ul.checkmarks, ul.links { 
+	list-style: none;
+	padding-left: 10px; 
+	}
+
+blockquote {
+	font-family: 'PT Serif Italic', Georgia, serif;
+	font-style: italic;
+	margin: 32px 0 64px 8px;
+	padding: 4px 8px;
+	border-left: 5px solid #d7dde1;
+	display: block;
+	font-size: 14px;
+	}
+a, a:visited {
+	color: #607890;
+	text-decoration: none;
+	}
+a:hover {
+	color: #39444a;
+	}
+h1 a,
+h2 a,
+h1 a:visited,
+h2 a:visited {
+	color: #39444a;
+	}
+h2.page-title a,
+h1.page-title a {
+	color: #39444a;
+	}
+img {
+	max-width: 97%;
+	height: auto;
+	display: block;
+	left: -5px;
+	position: relative;
+	}
+header {
+	background: transparent url(../img/spigot-sprites.png) 0px -63px repeat-x;
+	height: 141px;
+	margin-top: 15px;
+	}
+
+header .wrap {
+	max-width: 1092px;
+	width: 96%;
+	margin: 0 auto;
+	}
+h1#site-title {
+	margin: 0;
+	}
+#site-title a {
+	position: relative;
+	z-index: 100;
+	display: block;
+	width: 362px;
+	height: 141px;
+	text-indent: -9999px;
+	background: transparent url(../img/spigot-logo-huge.png) top left no-repeat;
+	}
+#site-description {
+	display: none;
+	}
+#menu-primary .menu {
+	position: relative;
+	z-index: 50;
+	right: 0;
+	top: -80px;
+	overflow: hidden;
+	}
+#menu-primary .menu ul {
+	float: right;
+	overflow: hidden;
+	}
+#menu-primary .menu li {
+	display: block;
+	float: left;
+	text-transform: uppercase;
+	padding: 0;
+	margin: 0 16px;
+	font-size: 13px;
+	letter-spacing: 1px;
+	}
+#menu-primary .menu li a {
+	display: block;
+	padding: 3px 5px;
+	color: #969696;
+	text-decoration: none;
+	-webkit-transition: all .2s ease;
+	-moz-transition: all .2s ease;
+	-o-transition: all .2s ease;
+	transition: all .2s ease;
+	}
+#menu-primary .menu li a:hover,
+#menu-primary .menu li.current-menu-item a,
+#menu-primary .menu li.current_page_parent a {
+	text-decoration: none;
+	color: #53565c;
+	}
+#main {
+	max-width: 1092px;
+	width: 95%;
+	margin: 30px auto;
+	}
+#content {
+	margin-bottom: 35px;
+}
+h2.separate { 
+	padding-top: 8px; 
+	}
+.marquee { 
+	margin: 0 0 16px 0; 
+	}
+.marquee h2 { 
+	text-align: center; 
+	font-size: 90px;
+	margin: 0;
+	line-height: .875;
+	margin-bottom: 32px;
+	font-family: 'Fredericka the Great' , 'serif' ;
+
+	}
+.marquee h2 span.amp { 
+	font-size: 60px;
+	position: relative;
+	top: -10px;
+	}
+.marquee h3 { 
+	text-align: center; 
+	font-size: 20px;
+	background: transparent url(../img/stroke.gif) center left repeat-x;
+	max-width: 85%;
+	margin: 0 auto;
+	}
+.marquee h3 span { 
+	background: transparent url(../img/body-bg.png) top left repeat;
+	padding: 0 16px; 
+	font-family: 'HuiFontPRegular' , 'serif' ;
+	}
+ul#service-list {
+	list-style: none;
+	height: 140px;
+	width: 75%;
+	margin: 32px auto;
+	padding: 0;
+	max-width: 640px;
+		}
+ul#service-list li {
+	width: 137px;
+	float: left;
+	width: 25%;
+	}
+ul#service-list li a {
+	display: block;
+	text-indent: -9999px;
+	width: 137px;
+	height: 137px;
+	margin: 0 auto;
+	background: transparent url(../img/service-btns.png);
+	}
+ul#service-list li a:hover { }
+ul#service-list li#red a { background-position:0 0; }
+ul#service-list li#yellow a { background-position:-137px 0; }
+ul#service-list li#green a { background-position:-274px 0; }
+ul#service-list li#host { margin-right:0; }
+ul#service-list li#blue a { background-position:-410px 0; }
+p.cool {
+	background: transparent url(../img/stroke.gif) bottom left repeat-x;
+	text-transform: uppercase;
+	text-align: center;
+	padding-bottom: 32px;
+	margin: 32px 0 64px 0;
+	font-size: 12px;
+	clear: both;
+	color: #666;
+	}
+p.cool a { color: #969696; }
+p.cool a:hover { color: #39444a; }
+footer {
+	width: 100%;
+	clear: both;
+	overflow: hidden;
+	background: url(img/spigot-sprites.png) 0px -600px repeat-x;
+	margin-bottom: 25px;
+	padding-top: 25px;
+	text-align: center;
+	color: #92999e;
+	font-size: 11px;
+	}
+
+footer p {
+	font-size: 10px;
+	}
+
+footer a,footer a:visited {
+	color: #92999e;
+	text-decoration: underline;
+	text-transform: uppercase;
+	}
+
+footer a:hover {
+	color: #39444a;
+	}
+
+
+
+@media screen and (max-width: 1050px) {
+img.push-right { 
+	margin-bottom: 16px; 
+	}
+}
+
+@media screen and (max-width: 980px) {
+}
+
+@media only screen and  (max-width: 800px)  {
+.layout-default #content,
+.blog #content,
+.singular-post #content,
+.archive #content { 
+	width: 100%;
+	float: none; 
+	margin: 0;
+	}
+#sidebar-primary { 
+	display: none;
+	}
+
+header{ margin-bottom: 80px; }
+header.wrap { width: 100%; }
+.marquee h2 { 
+	font-size: 100px; 
+	}
+#site-title { margin: 0 auto; }	
+#site-title a {
+	width: 231px;
+	height: 187px;
+	background: transparent url(img/logos/spigot-logo-mid.png) top left no-repeat;
+	margin: 0 auto;
+	}
+#menu-primary .menu { top:-125px; width: 100%;}
+#menu-primary .menu ul { float: none; width: 100%; text-align: center; }
+#menu-primary .menu ul li { display:inline; float:none; }
+#menu-primary .menu ul li a { display: inline; }
+}
+
+@media only screen and (max-width: 500px) { 
+#site-title,
+h1#site-title { margin: 0 auto 32px auto; }	
+#site-title a {
+	width: 231px;
+	height: 187px;
+	background: transparent url(img/logos/spigot-logo-mid.png) top left no-repeat;
+	margin: 0 auto;
+	}
+#menu-primary .menu { top:-35px; width: 100%;}
+#menu-primary .menu ul { float: none; width: 100%; text-align: center; margin: 10px 0;}
+#menu-primary .menu ul li { display:inline; float:none; margin: 0 8px; font-size: 12px; }
+#menu-primary .menu ul li a { display: inline; }
+.marquee { margin:100px 0 0; }
+.marquee h2 { font-size:60px; margin-top:20px; }
+.marquee h2 span.amp { font-size:30px; }
+.marquee h3 { font-size:25px; max-width: 95%; }
+p.cool { margin:0 0 20px; padding-bottom:10px; font-size:11px; }
+#main { 
+	margin-top: 100px; 
+	}
+}
+@media only screen and (max-width: 320px) { 
+
+#menu-primary .menu ul li a { padding: 0; }
+.marquee h2 { 
+	font-size: 55px; 
+	}
+.marquee h3 { 
+	font-size: 22px; 
+	}
+img.push-right { 
+	width: 90%; 
+	}
+}
+@media only screen and (max-width: 240px) { 
+	 ul#service-list li { width:100%; }
+	} 
+
+
+article,aside,details,figcaption,figure,footer,header,hgroup,nav,section{display:block}audio,canvas,video{display:inline}html{font-size:100%}body{font-size:13px;line-height:1.231;margin:0}body,button,input,select,textarea{font-family:sans-serif;color:#222}a{color:#00e}a:visited{color:#551a8b}a:hover{color:#06e}a:focus{outline:thin dotted}a:hover,a:active{outline:0}abbr[title]{border-bottom:1px dotted}b,strong{font-weight:700}blockquote{margin:16px 40px}dfn{font-style:italic}hr{display:block;height:1px;border:0;border-top:1px solid #ccc;margin:16px 0;padding:0}ins{background:#ff9;color:#000;text-decoration:none}mark{background:#ff0;color:#000;font-style:italic;font-weight:700}pre,code,kbd,samp{font-family:monospace, monospace;font-size:16px}pre{white-space:pre-wrap}q{quotes:none}q:before,q:after{content:none}small{font-size:85%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sup{top:-.5em}sub{bottom:-4px}ul,ol{margin:16px 0;padding:0 0 0 40px}dd{margin:0 0 0 3%}nav ul,nav ol{list-style:none;list-style-image:none;margin:0;padding:0}img{border:0;vertical-align:middle}svg:not(:root){overflow:hidden}fieldset{border:0;margin:0;padding:0}legend{border:0;margin-left:-7px;padding:0}button,input,select,textarea{font-size:100%;vertical-align:middle;margin:0}button,input{line-height:normal;overflow:visible}table button,table input{overflow:auto}button::-moz-focus-inner,input::-moz-focus-inner{border:0;padding:0}textarea{overflow:auto;vertical-align:top}input:invalid,textarea:invalid{background-color:#f0dddd}table{border-collapse:collapse;border-spacing:0}td{vertical-align:top}audio:not([controls]),[hidden]{display:none}::-moz-selection,::selection{background:rgba(209,224,229,.75);color:#39444a}figure,form{margin:0}button,input[type=button],input[type=reset],input[type=submit]{cursor:pointer}
+
+
+#container #main #content section .entry-content .marquee .question_form {
+	margin-right: auto;
+	margin-left: auto;
+	margin-bottom: 30px;
+	float: left;
+	width: 100%;
+}
+#container #main #content section .entry-content .marquee .question_form dl {
+	text-align: left;
+}
+#container #main #content section .entry-content .marquee .question_form dl dt {
+	width: 15%;
+	float: left;
+	padding-left: 10%;
+}
+#container #main #content section .entry-content .marquee .question_form dl dt .red {
+	color: #cb5f4c;
+}
+#container #main #content section .entry-content .marquee .question_form dl dt .yellow {
+	color: #dfa030;
+}
+#container #main #content section .entry-content .marquee .question_form dl dt .green {
+	color: #88ac6f;
+}
+#container #main #content section .entry-content .marquee .question_form dl dt .blue {
+	color: #62afab;
+}
+#container #main #content section .entry-content .marquee .question_form dl dt .bit {
+	color: #D00;
+}
+#container #main #content section .entry-content .marquee .question_form dl dd input {
+	border: 1px dotted #999;
+}
+
+#container #main #content section .entry-content .marquee .question_form dl dd {
+	float: right;
+	width: 72%;
+}
+#container #main #content section .entry-content .marquee .question_ok {
+	text-align: center;
+	float: left;
+	width: 100%;
+	padding-left: 44%;
+}
+#container #main #content section .entry-content .marquee .question_ok {
+	height: 131px;
+	width: 131px;
+}
+#container #main #content section .entry-content .marquee .question_ok input {
+	text-align: center;
+}
+
+#container #main #content section .entry-content .marquee .answer_form {
+	margin-right: auto;
+	margin-left: auto;
+	margin-bottom: 30px;
+	float: left;
+	width: 100%;
+}
+#container #main #content section .entry-content .marquee .answer_form dl {
+	text-align: left;
+}
+#container #main #content section .entry-content .marquee .answer_form dl dt {
+	width: 15%;
+	float: left;
+	padding-left: 10%;
+}
+#container #main #content section .entry-content .marquee .answer_form dl dt .red {
+	color: #cb5f4c;
+}
+#container #main #content section .entry-content .marquee .answer_form dl dt .yellow {
+	color: #dfa030;
+}
+#container #main #content section .entry-content .marquee .answer_form dl dt .green {
+	color: #88ac6f;
+}
+#container #main #content section .entry-content .marquee .answer_form dl dt .blue {
+	color: #62afab;
+}
+#container #main #content section .entry-content .marquee .answer_form dl dt .bit {
+	color: #D00;
+}
+#container #main #content section .entry-content .marquee .answer_form dl dd input {
+	border: 1px dotted #999;
+}
+
+#container #main #content section .entry-content .marquee .answer_form dl dd {
+	float: right;
+	width: 72%;
+}
