@@ -4,39 +4,18 @@ runtime: python
 api_version: 1
 
 handlers:
+
+- url: /css
+  static_dir: css/
+
+- url: /font
+  static_dir: font/
+
+- url: /img
+  static_dir: img/
+
+- url: /templates
+  static_dir: templates/
+
 - url: /
-  static_files: index.html
-  upload: index.html
-
-- url: /sample1\.py
-  script: sample1.py
-
-- url: /sample2\.py
-  script: sample2.py
-
-- url: /sample3\.py
-  script: sample3.py
-
-- url: /sample4\.py
-  script: sample4.py
-
-- url: /sample5\.py
-  script: sample5.py
-
-- url: /sample6\.py
-  script: sample6.py
-
-- url: /sample7\.py
-  script: sample7.py
-
-- url: /sample8\.py
-  script: sample8.py
-
-- url: /sample9\.py
-  script: sample9.py
-
-- url: /test/
-  script: sample10.py
-
-- url: /main/
   script: main.py
