@@ -14,40 +14,36 @@ import libmatomotter
 import libGAEsession
 import conf
 
-def login_status(screen_name):
-	if screen_name:
-		r = u"Logged in as @"+screen_name+u' <a href="?m=logout">Logout</a>'
-	else:
-		r = u'<a href="?m=login">Login</a>'
-	return r
 
-def get_userlist(access_key,access_secret,uid):
-	if access_key and access_secret:
-		auth = tweepy.OAuthHandler(conf.dict['consumer_key'], conf.dict['consumer_secret']) # tweepy(TwitterAPI)にConsumer keyくわせる
-		users = []
-		id_list = {}
-		auth.set_access_token(access_key,access_secret)
-		api = tweepy.API(auth)
-		id_list = api.friends_ids()
-		if uid:
-			users.append(uid)
-			try:
-				id_list.remove(uid)
-			except:
-				pass
-		return_friends = []
-		while len(users) < 5 and len(id_list) > 0: # 5件格納 or idのストックがなくなるまでルーーーープ
-			users.append(id_list.pop(random.randint(0,len(id_list)-1))) # どんどん格納する
-		for i in api.lookup_users(users):
-			return_friends.append(i) # どんどん格納する
-		return return_friends
-	else:
-		return [get_user(uid)]
+def get_userlist(access_key=None,access_secret=None,uid=None):
 
-def get_user(uid):
-	auth = tweepy.OAuthHandler(conf.dict['consumer_key'], conf.dict['consumer_secret']) # tweepy(TwitterAPI)にConsumer keyくわせる
+	# Tweepyに認証情報渡す
+	auth = tweepy.OAuthHandler(conf.dict['consumer_key'], conf.dict['consumer_secret'])
 	api = tweepy.API(auth)
-	return api.lookup_users([uid])[0]
+
+	# 初期化
+	users = []
+	id_list = {}
+	return_users = {}
+	default_users = [152965674,132426553,78364364,12939012,36803580]
+	
+	if access_key and access_secret: # アクセスキーがある時はフォロー中を取りに行く
+		auth.set_access_token(access_key,access_secret)
+		id_list = api.friends_ids()
+	if uid: # IDの指定がある時は優先してリストに入れる
+		users.append(uid)
+		try:
+			id_list.remove(uid)
+		except:
+			pass
+	while len(users) < 5 and len(id_list) > 0: # IDリストが空になるか、5個貯まるまでルーーープ
+		users.append(id_list.pop(random.randint(0,len(id_list)-1)))
+	while len(users) < 5: # 5個に足りていなかったらデフォルトIDを設定
+		users.append(default_users.pop())
+	for i in api.lookup_users(users): # TweepyさんにID渡して戻ってきた情報をリストに入れる
+		return_users[i.id] = i
+	return return_users
+	# おわり
 
 def main():
 
@@ -77,7 +73,6 @@ def main():
 		"question":"",
 		"answer":"",
 		"param_make_theme":"",
-		"param_make_desc":"",
 		"param_make_option0":"",
 		"param_make_option1":"",
 		"param_make_option2":"",
@@ -90,6 +85,9 @@ def main():
 		"param_q_uid":"",
 		"param_q_options":[],
 		"param_q_tgt":[],
+		"login_toggle":"",
+		"param_target_url_1":"",
+		"param_target_url_2":"",
 		}
 
 
@@ -191,8 +189,6 @@ def main():
 					"id":session.get("id"),
 					"screen_name":session.get("screen_name")
 				}
-				url = HOME_URI+u"?m=q&id="+str(dbq.set(q))
-
 			else:
 				q = {
 					"theme":param.getvalue("theme","").decode("utf-8"),
@@ -201,30 +197,56 @@ def main():
 					"option2":param.getvalue("option2","").decode("utf-8"),
 					"option3":param.getvalue("option3","").decode("utf-8")
 				}
-				session.set("temp_q",q)
-				session.set("in_mode",("post_q",))
-				url = HOME_URI+u"?m=login"
+			session.set("temp_q",q)
 			session.save()
-			print u"Location:"+url
+			print u"Location:"+HOME_URI+u"?m=make_confirm"
 			sys.exit()
 
-		elif param.getvalue("post_flg","").decode("utf-8"):
-			if not param.getvalue("theme","").decode("utf-8"):
+		elif param.getvalue("post_flg","").decode("utf-8") or session.get("temp_q",None):
+
+			q = {
+				"theme":param.getvalue("theme","").decode("utf-8"),
+				"option0":param.getvalue("option0","").decode("utf-8"),
+				"option1":param.getvalue("option1","").decode("utf-8"),
+				"option2":param.getvalue("option2","").decode("utf-8"),
+				"option3":param.getvalue("option3","").decode("utf-8"),
+				}
+			
+			if session.get("temp_q",None):
+				q = session.pop("temp_q")
+				session.save()
+			
+			if not q["theme"]:
 				tmpl_args["error_make_theme"] = u"<br><b>タイトルを入力して下さい。</b>"
-			if not param.getvalue("desc","").decode("utf-8"):
-				tmpl_args["error_make_desc"] = u"<br><b>説明文を入力して下さい。</b>"
-			if not param.getvalue("option0","").decode("utf-8"):
+			if not q["option0"]:
 				tmpl_args["error_make_option0"] = u"<br><b>選択肢1を入力して下さい。</b>"
-			if not param.getvalue("option1","").decode("utf-8"):
+			if not q["option1"]:
 				tmpl_args["error_make_option1"] = u"<br><b>選択肢2を入力して下さい。</b>"
-			tmpl_args["param_make_theme"] = param.getvalue("theme","").decode("utf-8")
-			tmpl_args["param_make_desc"] = param.getvalue("desc","").decode("utf-8")
-			tmpl_args["param_make_option0"] = param.getvalue("option0","").decode("utf-8")
-			tmpl_args["param_make_option1"] = param.getvalue("option1","").decode("utf-8")
-			tmpl_args["param_make_option2"] = param.getvalue("option2","").decode("utf-8")
-			tmpl_args["param_make_option3"] = param.getvalue("option3","").decode("utf-8")
+			tmpl_args["param_make_theme"] = q["theme"]
+			tmpl_args["param_make_option0"] = q["option0"]
+			tmpl_args["param_make_option1"] = q["option1"]
+			tmpl_args["param_make_option2"] = q["option2"]
+			tmpl_args["param_make_option3"] = q["option3"]
+			
 		else:
 			pass
+
+	elif m == "make_confirm": # 質問投稿確認
+		tmpl_file = "answer.tmpl"
+		if session.get("temp_q",None):
+			q = session.get("temp_q")
+			tmpl_args["text"] = q["theme"]
+			tmpl_args["param_q_uid"] = session.get("id","")
+			for i in (q["option0"],q["option1"],q["option2"],q["option3"]):
+				if i == "":
+					break
+				tmpl_args["param_q_options"].append(i)
+##			for i in get_userlist(session.get("access_key",None),session.get("access_secret",None),tmpl_args["param_q_uid"]):
+##				q_tgt[str(i.id)] = i.screen_name
+			tmpl_args["param_q_tgt"] = get_userlist(session.get("access_key",None),session.get("access_secret",None),tmpl_args["param_q_uid"])
+		else:
+			sys.exit()
+			
 
 	elif m == "q": # 回答ペーーーーーージ
 		tmpl_file = "answer.tmpl"
@@ -304,6 +326,10 @@ def main():
 		tmpl_args["screen_name"] = u"@"+tmpl_args["screen_name"]
 	else:
 		tmpl_args["screen_name"] = u"ゲストさん (未認証)"
+	if session.get("id",None):
+		tmpl_args["login_toggle"] = u'<a href="./?m=logout">ログアウト</a>'
+	else:
+		tmpl_args["login_toggle"] = u'<a href="./?m=login">ログイン</a>'
 
 	# makoさんおねがいします！
 	print tmpl.render(**tmpl_args)

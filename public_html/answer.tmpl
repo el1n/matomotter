@@ -10,7 +10,7 @@
 % if param_q_uid:
 <div class="answer_form">
 <dl><br>
-<dt><span class="red">■</span> @${param_q_tgt.pop(int(param_q_uid))}さん</dt>
+<dt><span class="red">■</span><img src="${param_q_tgt[param_q_uid].profile_image_url}"> @${param_q_tgt.pop(param_q_uid).screen_name}さん</dt>
 <dd>
 % for i2 in param_q_options:
 <input type="radio" name="${param_q_uid}" value="${param_q_options.index(i2)}">${i2}
@@ -22,7 +22,7 @@
 % for i in param_q_tgt:
 <div class="answer_form">
 <dl>
-<dt><span class="yellow">■</span> @${param_q_tgt[i]}さん</dt>
+<dt><span class="yellow">■</span><img src="${param_q_tgt[i].profile_image_url}"> @${param_q_tgt[i].screen_name}さん</dt>
 <dd>
 % for i2 in param_q_options:
 <input type="radio" name="${i}" value="${param_q_options.index(i2)}">${i2}
@@ -31,7 +31,7 @@
 </dl>
 </div>
 % endfor
-                            <div class="question_ok"><input type="image" src="img/ok-btns_red.png" width="131" height="131" alt="投稿する"></div>
+                            <div class="question_ok"><input type="image" src="img/post-btns_red.png" width="131" height="131" alt="投稿する"></div>
 						</div>
 					</section>
 				</section>
