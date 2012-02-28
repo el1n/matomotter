@@ -7,7 +7,7 @@
 						<div class="marquee">
 							<h3><span>質問を作成する</span></h3>
 							<form method="post" action="?m=make">
-							<input type="hidden" name="post_flg" value="1">
+							<input type="hidden" name="post_flg" value="True">
                             <div class="question_form">
                             	<br />
                             	<dl>
@@ -20,7 +20,7 @@
                             	<dl>
                             		<dt><span class="yellow">■</span> タイトル <span class="bit">*</span></dt>
                             		<dd>
-										<input type="text" value="${param_make_theme}" maxlength="30" name="theme" autocomplete="off" id="01" style="width: 15em" class="form1"> ${error_make_theme}
+										<input type="text" value="${param_theme}" maxlength="30" name="theme" autocomplete="off" id="01" style="width: 15em" class="form1"> ${error_theme}
                                     </dd>
                             	</dl>
                             </div>
@@ -28,7 +28,7 @@
                             	<dl>
                             		<dt><span class="blue">■</span> 選択肢１ <span class="bit">*</span></dt>
                             		<dd>
-										<input type="text" value="${param_make_option0}" maxlength="30" name="option0" autocomplete="off" id="03" style="width: 15em" class="form2"> ${error_make_option0}
+										<input type="text" value="${param_option0}" maxlength="30" name="option0" autocomplete="off" id="03" style="width: 15em" class="form2"> ${error_option0}
                                     </dd>
                             	</dl>
                             </div>
@@ -36,7 +36,7 @@
                             	<dl>
                             		<dt><span class="blue">■</span> 選択肢２ <span class="bit">*</span></dt>
                             		<dd>
-										<input type="text" value="${param_make_option1}" maxlength="30" name="option1" autocomplete="off" id="04" style="width: 15em" class="form2"> ${error_make_option1}
+										<input type="text" value="${param_option1}" maxlength="30" name="option1" autocomplete="off" id="04" style="width: 15em" class="form2"> ${error_option1}
                                     </dd>
                             	</dl>
                             </div>
@@ -44,7 +44,7 @@
                             	<dl>
                             		<dt><span class="blue">■</span> 選択肢３</dt>
                             		<dd>
-										<input type="text" value="${param_make_option2}" maxlength="30" name="option2" autocomplete="off" id="05" style="width: 15em" class="form2">
+										<input type="text" value="${param_option2}" maxlength="30" name="option2" autocomplete="off" id="05" style="width: 15em" class="form2">
                                     </dd>
                             	</dl>
                             </div>
@@ -52,7 +52,7 @@
                             	<dl>
                             		<dt><span class="blue">■</span> 選択肢４</dt>
                             		<dd>
-										<input type="text" value="${param_make_option3}" maxlength="30" name="option3" autocomplete="off" id="06" style="width: 15em" class="form2">
+										<input type="text" value="${param_option3}" maxlength="30" name="option3" autocomplete="off" id="06" style="width: 15em" class="form2">
                                     </dd>
                             	</dl>
                             </div>
