@@ -98,6 +98,8 @@ def main():
 		"login_toggle":"",
 		"param_target_url_1":"",
 		"param_target_url_2":"",
+                "Results_id":[],
+                "Results_value":{},
 		}
 
 
@@ -131,10 +133,7 @@ def main():
 				http_loc = auth.get_authorization_url()
 				session.set("token_secret", auth.request_token.secret)
 		else:
-			if bitten_cookie:
-				http_loc = HOME_URI
-			else:
-				http_loc = HOME_URI+u"/?m=cookie_error"
+			http_loc = HOME_URI if bitten_cookie else HOME_URI+u"/?m=cookie_error"
 				
 	elif m == "logout":
 		session.clear()
@@ -182,10 +181,7 @@ def main():
 				tmpl_args["param_q_options"].append(i)
 			tmpl_args["param_q_tgt"] = get_userlist(session.get("access_key",None),session.get("access_secret",None),tmpl_args["param_q_uid"])
 		else:
-			if bitten_cookie:
-				http_loc = HOME_URI+u"/?m=make"
-			else:
-				http_loc = HOME_URI+u"/?m=cookie_error"
+			http_loc = HOME_URI+u"/?m=make" if bitten_cookie else HOME_URI+u"/?m=cookie_error"
 
 	elif m == "make_post": # 質問投稿処理
 		if session.get("q",None):
@@ -249,11 +245,26 @@ def main():
                                 dba.set(i)
 
                 else:
-			if bitten_cookie:
-				http_loc = HOME_URI
-			else:
-				http_loc = HOME_URI+u"/?m=cookie_error"
+			http_loc = HOME_URI if bitten_cookie else HOME_URI+u"/?m=cookie_error"
 
+        elif m == "my": # 結果表示ページ
+                tmpl_file = "result.tmpl"
+                #仮データ
+                tmpl_args["Results_id"] = [100,200]
+                tmpl_args["Results_value"] = {100:{"Question":"質問1",
+                                                   "Answer_num":3,
+                                                   "Answer_text":["回答1","回答2","回答3"],
+                                                   "Answer_Per":[10.00,20.00,70.00],
+                                                   "Answered_User":[[],[],get_userlist().values()]
+                                                   },
+                                              200:{"Question":"質問2",
+                                                   "Answer_num":4,
+                                                   "Answer_text":["回答1","回答2","回答3","回答4"],
+                                                   "Answer_Per":[10.00,20.00,30.00,40.00],
+                                                   "Answered_User":[[],[],get_userlist().values(),[]]
+                                                   }
+                                              }
+                
 	elif m == "cookie_error": # クッキーないよページ
 		tmpl_args["text"] = u"クッキー食べてください"
 

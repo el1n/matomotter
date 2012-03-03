@@ -1,0 +1,39 @@
+<%include file="header.tmpl"/>
+<center>
+<div id="resultContainer">
+	<div id="resultTitle">
+	</div>
+	<div id="resultBoxes">
+
+% for i in Results_id:
+		<div class="resultBox">
+			<div class="Question">
+				${Results_value[i]["Question"]}
+			</div>
+			<div class="Answers">
+
+				% for i2 in range(Results_value[i]["Answer_num"]):
+				<div class="Answer">
+					<div class="AnswerText">
+						${Results_value[i]["Answer_text"][i2]}
+					</div>
+					<div class="AnswerPer">
+						${Results_value[i]["Answer_Per"][i2]}
+					</div>
+					<div class="AnsweredUser">
+						% for i3 in Results_value[i]["Answered_User"][i2]:
+						<img src="${i3.profile_image_url}">
+						% endfor
+					</div>
+				</div>
+				% endfor
+			</div>
+		</div>
+% endfor
+
+	</div>
+	<div id="resultFooter">
+	</div>
+</div>
+</center>
+<%include file="footer.tmpl"/>
